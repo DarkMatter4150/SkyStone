@@ -43,4 +43,6 @@ public class BreakoutServo {
         servo.setPosition(position);
     }
 
+    public double getPosition() { return this.servo.getPosition(); }
+
 }

@@ -18,7 +18,6 @@ public class BreakoutMotor {
         Direction(DcMotor.Direction motorDirection) {
             this.motorDirection = motorDirection;
         }
-
     }
 
     //Define motor as a DcMotor
@@ -53,4 +52,10 @@ public class BreakoutMotor {
     public int getCurrentPosition() { return this.motor.getCurrentPosition(); }
 
     public boolean isBusy() { return this.motor.isBusy(); }
+
+    public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior behavior) {
+        motor.setZeroPowerBehavior(behavior);
+    }
+
+    public double getPower() { return this.motor.getPower(); }
 }

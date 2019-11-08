@@ -12,8 +12,8 @@ public class Field {
 
         FieldObject redDepot = new FieldObject(0.0f, 0.0f, 24.0f, 24.0f, "r depot");
         FieldObject blueDepot = new FieldObject(10.0f, 0.0f, 24.0f, 24.0f, "b depot");
-        FieldObject redSkyStones = new FieldObject(48.0f, 0.0f, -4.0f, 48.0f, "r sky stones");
-        FieldObject blueSkyStones = new FieldObject(4.0f, 0.0f, 4.0f, 48.0f, "b sky stones");
+        FieldObject redSkyStones = new FieldObject(92.0f, 0.0f, 4.0f, 48.0f, "r sky stones");
+        FieldObject blueSkyStones = new FieldObject(48.0f, 0.0f, 4.0f, 48.0f, "b sky stones");
         FieldObject redFoundation = new FieldObject(96.75f, 140.0f, -18.5f, -34.5f, "r foundation");
         FieldObject blueFoundation = new FieldObject(47.25f, 140.0f, 18.5f, -34.5f, "b foundation");
         BuildSite redBuildSite = new BuildSite(120.0f, 120.0f, 24.0f, 24.0f, "r build site", true);

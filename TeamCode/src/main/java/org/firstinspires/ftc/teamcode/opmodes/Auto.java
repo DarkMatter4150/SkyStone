@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.mecanum.Mecanum;
 import java.util.ArrayList;
 import java.util.Timer;
 
-@Autonomous(name = "Auto", group = "Pushbot")
+//@Autonomous(name = "Auto", group = "Pushbot")
 
 public class Auto extends LinearOpMode {
 
@@ -37,7 +37,7 @@ public class Auto extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        robotObject = new FieldObject(0,0, 18, 18, "robot");
+        robotObject = new FieldObject(126,24, 18, 18, "robot");
 
         /*
          * Initialize the drive system variables.
@@ -70,7 +70,8 @@ public class Auto extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        encoderDrive(robot, robotObject, field.getObject("r sky stones"), 0, 24, 0, 1000);
+        //START IN FRONT OF SKYSTONES
+        encoderDrive(robot, robotObject, field.getObject("r sky stones"), 4, 24, 0, 1000);
         pickUpBlock(1000);
         encoderDrive(robot, robotObject, field.getObject("mid line"), 12, -20, 0, 0);
         encoderDrive(robot, robotObject, field.getObject("mid line"), 12, 20, 0, 1000);
@@ -88,7 +89,7 @@ public class Auto extends LinearOpMode {
 
 
 
-    public void encoderDrive(Robot robot,
+    private void encoderDrive(Robot robot,
                              FieldObject robotObject, FieldObject destination,
                              float xOffset, float yOffset, float rotationDegrees,
                              long waitTime) {
@@ -180,6 +181,11 @@ public class Auto extends LinearOpMode {
             robot.setRunMode(Robot.Motor.BACK_RIGHT, DcMotor.RunMode.RUN_TO_POSITION);
             // reset the timeout time and start motion.
             runtime.reset();
+            //TODO: add speeds
+            robot.setPower(Robot.Motor.FRONT_LEFT, 1);
+            robot.setPower(Robot.Motor.FRONT_RIGHT, 1);
+            robot.setPower(Robot.Motor.BACK_LEFT, 1);
+            robot.setPower(Robot.Motor.BACK_RIGHT, 1);
 
             // keep looping while we are still active, and there is time left, and both motors are running.
             // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits

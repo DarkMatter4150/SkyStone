@@ -19,6 +19,23 @@ public class Robot {
         FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT
     }
 
+    public enum ClawPos {
+        OPEN(0.83d), CLOSED(1.0d);
+
+        private double pos;
+
+        ClawPos(double pos) { this.pos = pos; }
+    }
+
+    public enum TabPos {
+        LEFT_OPEN(1.0d), LEFT_CLOSED(0.56d),
+        RIGHT_OPEN(0.08d), RIGHT_CLOSED(0.52d);
+
+        private double pos;
+
+        TabPos(double pos) { this.pos = pos; }
+    }
+
     //Motors
     private BreakoutMotor frontLeft = new BreakoutMotor();
     private BreakoutMotor frontRight = new BreakoutMotor();
@@ -26,10 +43,12 @@ public class Robot {
     private BreakoutMotor backRight = new BreakoutMotor();
     private BreakoutMotor wheelIntakeLeft = new BreakoutMotor();
     private BreakoutMotor wheelIntakeRight = new BreakoutMotor();
+    private BreakoutMotor arm = new BreakoutMotor();
 
     //Servos
     private BreakoutServo tabLeft = new BreakoutServo();
     private BreakoutServo tabRight = new BreakoutServo();
+    private BreakoutServo claw = new BreakoutServo();
 
     //Gyro
     private BreakoutREVGyro gyro = new BreakoutREVGyro();
@@ -44,6 +63,7 @@ public class Robot {
     private double startTime;
     private double lastTime = -1;
     double previousError = 0;
+    private final double ARM_CYCLES_PER_REV = 1425.2;
 
     /* Constructor */
     public Robot(Telemetry telemetry) {
@@ -55,13 +75,45 @@ public class Robot {
     }
 
     public void setWheelIntake(float power) {
-        wheelIntakeLeft.setPower(power);
+        wheelIntakeLeft.setPower(-power);
         wheelIntakeRight.setPower(power);
     }
 
-    public void setTabs(float position) {
-        tabLeft.setPosition(position);
-        tabRight.setPosition(position);
+    public void setTabs(boolean open) {
+        if (open) {
+            tabLeft.setPosition(TabPos.LEFT_OPEN.pos);
+            tabRight.setPosition(TabPos.RIGHT_OPEN.pos);
+        } else {
+            tabLeft.setPosition(TabPos.LEFT_CLOSED.pos);
+            tabRight.setPosition(TabPos.RIGHT_CLOSED.pos);
+        }
+    }
+
+    public void setClaw(boolean open) {
+        if (open) {
+            claw.setPosition(ClawPos.OPEN.pos);
+        } else {
+            claw.setPosition(ClawPos.CLOSED.pos);
+        }
+    }
+
+    public double getClawPos() {
+        return claw.getPosition();
+    }
+
+    @Deprecated
+    public void setArmPower(float power) {
+        arm.setPower(power);
+    }
+
+    public void moveArm(float power) {
+        arm.setTargetPosition(arm.getCurrentPosition() + (int)(power*80));
+        arm.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
+        if (arm.getCurrentPosition() + (int)(power*104) < arm.getCurrentPosition()) {
+            arm.setPower(-1);
+        } else {
+            arm.setPower(1);
+        }
     }
 
     public void setPower(Motor motor, float power) {
@@ -78,6 +130,21 @@ public class Robot {
             case BACK_RIGHT:
                 backRight.setPower(power);
                 break;
+        }
+    }
+
+    public double getPower(Motor motor) {
+        switch (motor) {
+            case FRONT_LEFT:
+                return frontLeft.getPower();
+            case FRONT_RIGHT:
+                return frontRight.getPower();
+            case BACK_LEFT:
+                return backLeft.getPower();
+            case BACK_RIGHT:
+                return backRight.getPower();
+            default:
+                return 0;
         }
     }
 
@@ -230,11 +297,14 @@ public class Robot {
         backLeft.set(hardwareMap.dcMotor.get("backLeft"));
         backRight.set(hardwareMap.dcMotor.get("backRight"));
 
-//        wheelIntakeLeft.set(hardwareMap.dcMotor.get("wheelIntakeLeft"));
-//        wheelIntakeRight.set(hardwareMap.dcMotor.get("wheelIntakeRight"));
+        wheelIntakeLeft.set(hardwareMap.dcMotor.get("leftIntake"));
+        wheelIntakeRight.set(hardwareMap.dcMotor.get("rightIntake"));
 
         tabLeft.set(hardwareMap.servo.get("tabLeft"));
         tabRight.set(hardwareMap.servo.get("tabRight"));
+
+        arm.set(hardwareMap.dcMotor.get("arm"));
+        claw.set(hardwareMap.servo.get("claw"));
 
         //Set directions for left and right motors
         //F = Clockwise while looking at axle
@@ -244,11 +314,10 @@ public class Robot {
         backLeft.setDirection(MOTOR_R);
         backRight.setDirection(MOTOR_F);
 
-//        wheelIntakeLeft.setDirection(MOTOR_F);
-//        wheelIntakeRight.setDirection(MOTOR_R);
+        wheelIntakeLeft.setDirection(MOTOR_F);
+        wheelIntakeRight.setDirection(MOTOR_R);
 
-        tabLeft.setDirection(BreakoutServo.Direction.SERVO_F);
-        tabRight.setDirection(BreakoutServo.Direction.SERVO_R);
+        arm.setDirection(MOTOR_F);
 
         // Set all motors to zero power
         frontLeft.setPower(0);
@@ -256,11 +325,14 @@ public class Robot {
         backLeft.setPower(0);
         backRight.setPower(0);
 
-//        wheelIntakeLeft.setPower(0);
-//        wheelIntakeRight.setPower(0);
+        wheelIntakeLeft.setPower(0);
+        wheelIntakeRight.setPower(0);
 
-        tabLeft.setPosition(0);
-        tabRight.setPosition(0);
+        tabLeft.setPosition(TabPos.LEFT_OPEN.pos);
+        tabRight.setPosition(TabPos.RIGHT_OPEN.pos);
+
+        arm.setPower(0);
+        claw.setPosition(ClawPos.OPEN.pos);
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
@@ -269,7 +341,10 @@ public class Robot {
         backLeft.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-//        wheelIntakeLeft.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        wheelIntakeRight.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        wheelIntakeLeft.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        wheelIntakeRight.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        arm.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 }

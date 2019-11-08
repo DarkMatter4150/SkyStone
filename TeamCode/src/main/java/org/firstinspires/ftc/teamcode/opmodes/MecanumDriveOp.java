@@ -23,7 +23,14 @@ public class MecanumDriveOp extends OpMode {
 
     //Motor objects
     private Robot robot = new Robot(telemetry);
+    private ElapsedTime timer = new ElapsedTime();
     private Mecanum drive;
+    private boolean slow = false;
+    private boolean claw = false;
+    private boolean tabs = true;
+    private double clawTimer = 0;
+    private double tabTimer = 0;
+    private double slowTimer = 0;
 
     @Override
     public void init() {
@@ -62,35 +69,82 @@ public class MecanumDriveOp extends OpMode {
         float leftStick2y = -gamepad2.left_stick_y;
         float rightStick2x = gamepad2.right_stick_x;
         float rightStick2y = -gamepad2.right_stick_y;
+        float leftTrigger2 = gamepad2.left_trigger;
+        float rightTrigger2 = gamepad2.right_trigger;
+        boolean aButton = gamepad2.a;
+        boolean bButton = gamepad2.b;
+        boolean xButton = gamepad2.x;
+        boolean yButton = gamepad2.y;
 
         //Move the motors//
         float[] output;
-        if (leftStick1y >= 0.1 || leftStick1y <= -0.1 || rightStick1x >= 0.1 || rightStick1x <= -0.1 || rightTrigger1 != 0 || leftTrigger1 != 0) {
-            float turnPower;
-            telemetry.addData("sticks moving it", "");
-            if (rightTrigger1 != 0 || leftTrigger1 != 0) {
-                turnPower = rightTrigger1 - leftTrigger1;
-                robot.resetAngle();
+        boolean stickDeadZone = leftStick1y >= 0.1 || leftStick1y <= -0.1 || rightStick1x >= 0.1 || rightStick1x <= -0.1 || rightTrigger1 != 0 || leftTrigger1 != 0;
+        if (slow) {
+            if (stickDeadZone) {
+                float turnPower;
+                telemetry.addData("sticks moving it", "");
+                if (rightTrigger1 != 0 || leftTrigger1 != 0) {
+                    turnPower = rightTrigger1 - leftTrigger1;
+                    robot.resetAngle();
+                } else {
+                    turnPower = 0;//(float)robot.checkDirection();
+                }
+                output = drive.setPower(rightStick1x/2, leftStick1y/2, turnPower/2);
             } else {
-                turnPower = 0;//(float)robot.checkDirection();
+                output = drive.setPower(0, 0, 0);//(float)robot.checkDirection());
+                telemetry.addData("moving itself", "");
             }
-            output = drive.setPower(rightStick1x, leftStick1y, turnPower);
         } else {
-            output = drive.setPower(0,0,0);//(float)robot.checkDirection());
-            telemetry.addData("moving itself", "");
+            if (stickDeadZone) {
+                float turnPower;
+                telemetry.addData("sticks moving it", "");
+                if (rightTrigger1 != 0 || leftTrigger1 != 0) {
+                    turnPower = rightTrigger1 - leftTrigger1;
+                    robot.resetAngle();
+                } else {
+                    turnPower = 0;//(float)robot.checkDirection();
+                }
+                output = drive.setPower(rightStick1x, leftStick1y, turnPower);
+            } else {
+                output = drive.setPower(0, 0, 0);//(float)robot.checkDirection());
+                telemetry.addData("moving itself", "");
+            }
         }
+
+        if (aButton && timer.milliseconds() - tabTimer > 250) {
+            tabs = !tabs;
+            robot.setTabs(tabs);
+            tabTimer = timer.milliseconds();
+        }
+
+        if (yButton && timer.milliseconds() - clawTimer > 250) {
+            claw = !claw;
+            robot.setClaw(claw);
+            clawTimer = timer.milliseconds();
+        }
+
+        if (gamepad1.a && timer.milliseconds() - slowTimer > 250) {
+            slow = !slow;
+            slowTimer = timer.milliseconds();
+        }
+
+        robot.setWheelIntake(leftTrigger2-rightTrigger2);
+
+        //Arm
+//        robot.setArmPower(leftStick2y/2);
+        robot.moveArm(leftStick2y);
 
         //Telemetry
         telemetry.addData("FL", output[0]);
         telemetry.addData("FR", output[1]);
         telemetry.addData("BL", output[2]);
         telemetry.addData("BR", output[3]);
-//        telemetry.addData("Left Stick X 1", leftStick1x);
-        telemetry.addData("Left Stick Y 1", leftStick1y);
-        telemetry.addData("Right Stick X 1", rightStick1x);
-//        telemetry.addData("Right Stick Y 1", rightStick1y);
-//        telemetry.addData("Left Stick X 2", leftStick2x);
-//        telemetry.addData("Left Stick Y 2", leftStick2y);
+        telemetry.addData("FL Power Float", robot.getPower(Robot.Motor.FRONT_LEFT));
+        telemetry.addData("FR Power Float", robot.getPower(Robot.Motor.FRONT_RIGHT));
+        telemetry.addData("BL Power Float", robot.getPower(Robot.Motor.BACK_LEFT));
+        telemetry.addData("BR Power Float", robot.getPower(Robot.Motor.BACK_RIGHT));
+        telemetry.addData("Claw Pos", robot.getClawPos());
+        telemetry.addData("slow?", slow);
         RobotLog.i(robot.tag(NAME), "FL " + output[0]);
         RobotLog.i(robot.tag(NAME), "FR " + output[1]);
         RobotLog.i(robot.tag(NAME), "BL " + output[2]);
