@@ -37,5 +37,6 @@ public class AutoRed extends LinearOpMode {
         robot.setTabs(false);
         drive.setPower(0, 1, 0);
         while (timer.milliseconds() - startTime < 1583.333);
+        //
     }
 }
