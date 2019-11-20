@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.breakout.Robot;
 import org.firstinspires.ftc.teamcode.mecanum.Mecanum;
 
-@Autonomous(name="Red Autonomous", group="pushbot")
-public class AutoRed extends LinearOpMode {
+//@Autonomous(name="Red Autonomous", group="pushbot")
+public class DeprecatedAutoRed extends LinearOpMode {
 
     private Robot robot = new Robot(telemetry);
     private Mecanum drive = new Mecanum(robot, telemetry);
@@ -30,12 +30,19 @@ public class AutoRed extends LinearOpMode {
     }
 
     public void moveFoundation() {
+        drive.setPower(-1, 0, -0.1f);
+        double time = timer.milliseconds();
+        while (timer.milliseconds() - time < 450 && opModeIsActive());
+        drive.setPower(0, 0, 0);
         double startTime = timer.milliseconds();
         drive.setPower(0, -1, 0);
-        while (timer.milliseconds() - startTime < 1583.333);
+        while (timer.milliseconds() - startTime < 1500 && opModeIsActive());
         drive.setPower(0,0,0);
         robot.setTabs(false);
         drive.setPower(0, 1, 0);
-        while (timer.milliseconds() - startTime < 1583.333);
+        while (timer.milliseconds() - startTime < (3500) && opModeIsActive());
+        drive.setPower(0, 0, 0);
+        robot.setTabs(true);
+        while (timer.milliseconds() - startTime < (5000) && opModeIsActive());
     }
 }

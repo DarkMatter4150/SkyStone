@@ -60,4 +60,10 @@ public class Matrix {
         x[1] = matrix[0].length;
         return x;
     }
+
+    @Override
+    public String toString() {
+        float[] array = {getValue(0, 0), getValue(1, 0), getValue(0, 1), getValue(1, 1)};
+        return "[" + array[0] + "," + array[1] + "," + array[2] + "," + array[3] + "]";
+    }
 }

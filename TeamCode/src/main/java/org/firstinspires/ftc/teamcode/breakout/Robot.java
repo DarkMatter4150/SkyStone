@@ -107,7 +107,7 @@ public class Robot {
     }
 
     public void moveArm(float power) {
-        arm.setTargetPosition(arm.getCurrentPosition() + (int)(power*80));
+        arm.setTargetPosition(arm.getCurrentPosition() + (int)(power*104));
         arm.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
         if (arm.getCurrentPosition() + (int)(power*104) < arm.getCurrentPosition()) {
             arm.setPower(-1);
@@ -336,10 +336,10 @@ public class Robot {
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
-        frontLeft.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRight.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeft.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRight.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontLeft.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontRight.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeft.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backRight.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         wheelIntakeLeft.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         wheelIntakeRight.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

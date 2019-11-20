@@ -10,9 +10,9 @@ import static BreakoutBase.BreakoutServo.Direction.SERVO_F;
 import static BreakoutBase.BreakoutServo.Direction.SERVO_R;
 
 /**
- * This class is used for the Auto segment of the game. No controllers are to be used.
+ * This class is used for the RedAutonomous segment of the game. No controllers are to be used.
  **/
-//@Auto(name = "BreakoutAutonomous", group = "pushbot")
+//@RedAutonomous(name = "BreakoutAutonomous", group = "pushbot")
 
 public class BreakoutAutoOp extends OpMode {
 

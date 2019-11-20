@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package LastYears;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.breakout.Robot;
 import org.firstinspires.ftc.teamcode.mecanum.Mecanum;
 
-@Autonomous(name="first comp auto MOVES LEFT", group="basic")
-public class FirstCompAutoLEFT extends LinearOpMode {
+@Autonomous(name="first comp auto", group="basic")
+public class FirstCompAuto extends LinearOpMode {
 
     private Robot robot = new Robot(telemetry);
     private Mecanum drive = new Mecanum(robot, telemetry);
@@ -23,8 +23,8 @@ public class FirstCompAutoLEFT extends LinearOpMode {
 
         //3 feet per second of drive @ speed = 1
         double startTime = timer.milliseconds();
-        drive.setPower(-1, 1, 0);
-        while (timer.milliseconds() - startTime < 1000);
+        drive.setPower(1, 0, 0);
+        while (timer.milliseconds() - startTime < 500);
         drive.setPower( 0, 0, 0);
     }
 

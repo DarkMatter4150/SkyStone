@@ -1,6 +1,6 @@
 //package ExampleCode;
 //
-//import com.qualcomm.robotcore.eventloop.opmode.Auto;
+//import com.qualcomm.robotcore.eventloop.opmode.RedAutonomous;
 //import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 //import com.qualcomm.robotcore.util.ElapsedTime;
 //
@@ -24,9 +24,9 @@
 //import static org.firstinspires.ftc.teamcode.BreakoutMotor.Direction.MOTOR_F;
 //
 ///**
-// * This class is used for the Auto segment of the game. No controllers are to be used.
+// * This class is used for the RedAutonomous segment of the game. No controllers are to be used.
 // **/
-//@Auto(name = "Auto", group = "pushbot")
+//@RedAutonomous(name = "RedAutonomous", group = "pushbot")
 //
 //public class BreakoutAutoOp extends OpMode {
 //
