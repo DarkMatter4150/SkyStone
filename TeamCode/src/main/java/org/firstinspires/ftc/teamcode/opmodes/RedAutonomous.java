@@ -10,7 +10,6 @@ import org.firstinspires.ftc.teamcode.breakout.Robot;
 import org.firstinspires.ftc.teamcode.field.Field;
 import org.firstinspires.ftc.teamcode.field.FieldObject;
 import org.firstinspires.ftc.teamcode.field.RobotObject;
-import org.firstinspires.ftc.teamcode.matrix.Matrix;
 
 @Autonomous(name = "Red Autonomous", group = "Pushbot")
 public class RedAutonomous extends LinearOpMode {
@@ -62,8 +61,8 @@ public class RedAutonomous extends LinearOpMode {
         //START IN FRONT OF SKYSTONES
         move(field.getObject("r sky stones"), 0, 0, 0, 1000);
 //        grabBlock(1000);
-//        move(field.getObject("mid line"), 12, -20, 0, 0);
-//        move(field.getObject("mid line"), 12, 20, 0, 1000);
+        move(field.getObject("mid line"), 12, -20, 0, 0);
+        move(field.getObject("mid line"), 12, 20, 0, 1000);
 //        dropBlock(1000);
 
         telemetry.addData("Path", "Complete");

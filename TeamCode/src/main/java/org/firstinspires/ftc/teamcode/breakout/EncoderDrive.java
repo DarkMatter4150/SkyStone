@@ -19,10 +19,10 @@ public class EncoderDrive {
     private static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
     private static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
     private static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-            (WHEEL_DIAMETER_INCHES * 3.1415);
+            (WHEEL_DIAMETER_INCHES * Math.PI);
     private static final float DRIVE_SPEED = 1f;
 
-    public static final double TAU = 2 * Math.PI;
+    private static final double TAU = 2 * Math.PI;
 
     public EncoderDrive(Robot robot, RobotObject robotObject) {
         this.robot = robot;
@@ -50,21 +50,36 @@ public class EncoderDrive {
         float robotW = robotObject.getWidth();
         float robotX = robotObject.getX();
         float robotY = robotObject.getY();
-        float[] robotTopLeft = {robotX, robotY + robotL};
         float[] robotTopRight = {robotX + robotW, robotY + robotL};
         float[] robotBottomLeft = {robotX, robotY};
-        float[] robotBottomRight = {robotX + robotW, robotY};
-
-        float destCenterX = (destBottomLeft[0] + destTopRight[0]) / 2;
-        float destCenterY = (destBottomLeft[1] + destTopRight[1]) / 2;
 
         float robotCenterX = (robotBottomLeft[0] + robotTopRight[0]) / 2;
         float robotCenterY = (robotBottomLeft[1] + robotTopRight[1]) / 2;
         float[] robotCenter = {robotCenterX, robotCenterY};
-        float[] destCenter = {destCenterX, destCenterY};
 
         float robotangle = this.robotObject.getRotation();
-        double destangle = Math.atan((destBottomLeft[1] - robotBottomLeft[1]) / (destBottomLeft[0] - robotBottomLeft[0]));
+        float xCoord = (destBottomLeft[0] - robotBottomLeft[0]);
+        float yCoord = (destBottomLeft[1] - robotBottomLeft[1]);
+        double angle = Math.atan((destBottomLeft[1] - robotBottomLeft[1]) / (destBottomLeft[0] - robotBottomLeft[0]));
+        double destangle;
+        if (xCoord > 0 && yCoord > 0) {
+            destangle = angle;
+        } else if (xCoord < 0 && yCoord > 0) {
+            destangle = angle + 90;
+        } else if (xCoord < 0 && yCoord < 0) {
+            destangle = angle + 180;
+        } else if (xCoord > 0 && yCoord < 0) {
+            destangle = angle + 270;
+        } else if (xCoord == 0 && yCoord > 0) {
+            destangle = 90;
+        } else if (yCoord == 0 && xCoord > 0) {
+            destangle = 180;
+        } else if (xCoord == 0 && yCoord < 0) {
+            destangle = 270;
+        } else {
+            destangle = 0;
+        }
+
         double theta = Math.toRadians(destangle - robotangle + 90);
         double c = Math.cos(theta);
         double s = Math.sin(theta);
@@ -79,49 +94,33 @@ public class EncoderDrive {
         float yInRelation4 = destTopRight[1] - robotCenter[1];
 
         float newX = Float.valueOf(String.valueOf((xInRelation1 * c) - (yInRelation1 * s))) + robotCenter[0];
-        float newY = Float.valueOf(String.valueOf((yInRelation1 * s) + (xInRelation1 * c))) + robotCenter[1];
+        float newY = Float.valueOf(String.valueOf((yInRelation1 * c) + (xInRelation1 * s))) + robotCenter[1];
 
         destTopLeft[0] = Float.valueOf(String.valueOf((xInRelation3 * c) - (yInRelation3 * s))) + robotCenter[0];
-        destTopLeft[1] = Float.valueOf(String.valueOf((yInRelation3 * s) + (xInRelation3 * c))) + robotCenter[1];
+        destTopLeft[1] = Float.valueOf(String.valueOf((yInRelation3 * c) + (xInRelation3 * s))) + robotCenter[1];
 
-        destTopRight[0] = Float.valueOf(String.valueOf((yInRelation2 * c) - (xInRelation2 * s))) + robotCenter[1];
-        destTopRight[1] = Float.valueOf(String.valueOf((yInRelation2 * s) + (xInRelation2 * c))) + robotCenter[1];
+        destTopRight[0] = Float.valueOf(String.valueOf((xInRelation2 * c) - (yInRelation2 * s))) + robotCenter[0];
+        destTopRight[1] = Float.valueOf(String.valueOf((yInRelation2 * c) + (xInRelation2 * s))) + robotCenter[1];
 
         destBottomLeft[0] = newX;
         destBottomLeft[1] = newY;
 
-        destBottomRight[0] = Float.valueOf(String.valueOf((yInRelation4 * c) - (xInRelation4 * s))) + robotCenter[1];
-        destBottomRight[1] = Float.valueOf(String.valueOf((yInRelation4 * s) + (xInRelation4 * c))) + robotCenter[1];
-        
-//        boolean robotIsLeftOfDest = false;
-//        boolean robotIsAboveDest = false;
-//        if (!((robotTopLeft[0] + robotTopRight[0]) / 2 < (destTopLeft[0] + destTopRight[0]) / 2)) {
-//            robotIsLeftOfDest = true;
-//        }
-//        if (!((robotTopLeft[1] + robotBottomLeft[1]) / 2 < (destTopLeft[1] + destBottomLeft[1]) / 2)) {
-//            robotIsAboveDest = true;
-//        }
-//
-//        if (robotIsAboveDest) {
-//            yInches = -(robotBottomRight[1] - destTopRight[1]) + yOffset;
-//        } else {
-//            yInches = destBottomRight[1] - robotTopRight[1] - yOffset;
-//        }
-//        if (robotIsLeftOfDest) {
-//            xInches = destBottomLeft[0] - robotBottomRight[0] + xOffset;
-//        } else {
-//            xInches = -(robotBottomLeft[0] - destBottomRight[0]) - xOffset;
-//        }
+        destBottomRight[0] = Float.valueOf(String.valueOf((xInRelation4 * c) - (yInRelation4 * s))) + robotCenter[0];
+        destBottomRight[1] = Float.valueOf(String.valueOf((yInRelation4 * c) + (xInRelation4 * s))) + robotCenter[1];
 
-        //TODO: test this code, and figure out offsets
+        float destCenterXNew = (destBottomLeft[0] + destTopRight[0]) / 2;
+        float destCenterYNew = (destBottomLeft[1] + destTopRight[1]) / 2;
 
-        float gotoX = destCenterX + xOffset;
-        float gotoY = destCenterY + yOffset;
+        float robotCenterXNew = (robotBottomLeft[0] + robotTopRight[0]) / 2;
+        float robotCenterYNew = (robotBottomLeft[1] + robotTopRight[1]) / 2;
 
-        float xInches = gotoX - robotCenterX;
-        float yInches = gotoY - robotCenterY;
+        float gotoX = destCenterXNew + xOffset;
+        float gotoY = destCenterYNew + yOffset;
 
-        float[] teledata = {gotoX, gotoY, robotBottomLeft[0], robotBottomLeft[1], Float.valueOf(String.valueOf(Math.toDegrees(theta)))};
+        float xInches = gotoX - robotCenterXNew;
+        float yInches = gotoY - robotCenterYNew;
+
+        float[] teledata = {Float.valueOf(Double.toString(c)), Float.valueOf(Double.toString(s)), destBottomLeft[1], destTopRight[1], destBottomRight[1], destTopLeft[1]};//robotBottomLeft[0], robotBottomLeft[1], gotoX, gotoY, Float.valueOf(String.valueOf(Math.toDegrees(theta)))};
 
         //TODO: figure out rotating (done i think, just test)
         //formula for arc length (degrees): theta/360 * tau * radius
@@ -149,8 +148,20 @@ public class EncoderDrive {
             fin = xyzHandler.addMatrices();
         }
 
-        robotObject.setX(destination.getX() + xOffset);
-        robotObject.setY(destination.getY() + yOffset);
+        //Float.valueOf(String.valueOf((xInRelation1 * c) - (yInRelation1 * s))) + robotCenter[0];
+
+        double c2 = Math.cos(-theta);
+        double s2 = Math.sin(-theta);
+
+        float xRelation = gotoX - robotCenterX;
+        float yRelation = gotoY - robotCenterY;
+        float newPosX = Float.valueOf(String.valueOf((xRelation * c2) - (yRelation * s2))) + robotCenter[0];
+        float newPosY = Float.valueOf(String.valueOf((yRelation * c2) + (xRelation * s2))) + robotCenter[1];
+
+        robotObject.setX(newPosX - 9);
+        robotObject.setY(newPosY - 9);
+        float robotDegrees = robotObject.getRotation();
+        robotObject.setRotation(robotDegrees + rotationDegrees);
 
         return new Data(teledata, fin);
     }
@@ -270,7 +281,7 @@ public class EncoderDrive {
         public float[] teledata;
         public Matrix fin;
 
-        public Data(float[] teledata, Matrix fin) {
+        Data(float[] teledata, Matrix fin) {
             this.teledata = teledata;
             this.fin = fin;
         }

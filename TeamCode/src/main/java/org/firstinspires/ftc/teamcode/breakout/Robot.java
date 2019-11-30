@@ -107,9 +107,10 @@ public class Robot {
     }
 
     public void moveArm(float power) {
-        arm.setTargetPosition(arm.getCurrentPosition() + (int)(power*104));
+        int target = arm.getCurrentPosition() + (int)(power*104);
+        arm.setTargetPosition(target);
         arm.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
-        if (arm.getCurrentPosition() + (int)(power*104) < arm.getCurrentPosition()) {
+        if (target < arm.getCurrentPosition()) {
             arm.setPower(-1);
         } else {
             arm.setPower(1);
