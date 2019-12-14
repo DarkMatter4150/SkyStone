@@ -2,23 +2,30 @@ package org.firstinspires.ftc.teamcode.breakout;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import static org.firstinspires.ftc.teamcode.breakout.BreakoutMotor.Direction.MOTOR_F;
 import static org.firstinspires.ftc.teamcode.breakout.BreakoutMotor.Direction.MOTOR_R;
 
+/**
+ * Class used for all information needed for the robot.
+ */
 public class Robot {
 
+    /**
+     * Enum for each motor on the robot.
+     */
     public enum Motor {
         FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT
     }
 
+    /**
+     * Enum for the claw's positions, open and closed.
+     */
     public enum ClawPos {
         OPEN(0.83d), CLOSED(1.0d);
 
@@ -27,6 +34,9 @@ public class Robot {
         ClawPos(double pos) { this.pos = pos; }
     }
 
+    /**
+     * Enum for the pull tabs' positions, open and closed for each side.
+     */
     public enum TabPos {
         LEFT_OPEN(1.0d), LEFT_CLOSED(0.56d),
         RIGHT_OPEN(0.08d), RIGHT_CLOSED(0.52d);
@@ -52,33 +62,31 @@ public class Robot {
 
     //Gyro
     private BreakoutREVGyro gyro = new BreakoutREVGyro();
-    private Orientation lastAngles = new Orientation();
-    private double globalAngle = 0;
-    private double targetAngle = 0;
 
     //Misc
     private HardwareMap hardwareMap;
-    private ElapsedTime period = new ElapsedTime();
     private Telemetry telemetry;
-    private double startTime;
-    private double lastTime = -1;
-    double previousError = 0;
-    private final double ARM_CYCLES_PER_REV = 1425.2;
 
     /* Constructor */
     public Robot(Telemetry telemetry) {
         this.telemetry = telemetry;
     }
 
-    public String tag(String driveOp) {
-        return "DM4150 " + driveOp + ": ";
-    }
-
+    /**
+     * Sets the power for each motor on the wheel intake.
+     *
+     * @param power Float from -1 to 1 indicating how fast the motor moves.
+     */
     public void setWheelIntake(float power) {
         wheelIntakeLeft.setPower(-power);
         wheelIntakeRight.setPower(power);
     }
 
+    /**
+     * Sets the tab position based on the boolean input.
+     *
+     * @param open Boolean variable to open/close the tabs.
+     */
     public void setTabs(boolean open) {
         if (open) {
             tabLeft.setPosition(TabPos.LEFT_OPEN.pos);
@@ -89,6 +97,11 @@ public class Robot {
         }
     }
 
+    /**
+     * Sets claw position to open or closed based on the boolean input.
+     *
+     * @param open Boolean variable to open/close the claw.
+     */
     public void setClaw(boolean open) {
         if (open) {
             claw.setPosition(ClawPos.OPEN.pos);
@@ -97,17 +110,32 @@ public class Robot {
         }
     }
 
+    /**
+     * Gets the position of the claw.
+     *
+     * @return Returns claw position.
+     */
     public double getClawPos() {
         return claw.getPosition();
     }
 
+    /**
+     * Sets the power of the arm motor.
+     *
+     * @param power Float from -1 to 1 to set how fast the motor moves.
+     */
     @Deprecated
     public void setArmPower(float power) {
         arm.setPower(power);
     }
 
+    /**
+     * Same effect as setArmPower but also uses encoders to help keep it more accurate.
+     *
+     * @param power Power of the motor from -1 to 1.
+     */
     public void moveArm(float power) {
-        int target = arm.getCurrentPosition() + (int)(power*104);
+        int target = arm.getCurrentPosition() + (int)(power*52);
         arm.setTargetPosition(target);
         arm.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
         if (target < arm.getCurrentPosition()) {
@@ -117,6 +145,12 @@ public class Robot {
         }
     }
 
+    /**
+     * Method to set the power of the {@link Motor} you pass in to the given power float.
+     *
+     * @param motor {@link Motor} to set the power of.
+     * @param power Power to set from -1 to 1.
+     */
     public void setPower(Motor motor, float power) {
         switch (motor) {
             case FRONT_LEFT:
@@ -134,6 +168,12 @@ public class Robot {
         }
     }
 
+    /**
+     * Method to get the power of the motors.
+     *
+     * @param motor {@link Motor} to get the power of.
+     * @return Float from -1 to 1 that the power of the motor is.
+     */
     public double getPower(Motor motor) {
         switch (motor) {
             case FRONT_LEFT:
@@ -149,6 +189,12 @@ public class Robot {
         }
     }
 
+    /**
+     * Sets the run mode of the given {@link Motor}.
+     *
+     * @param motor {@link Motor} to set the run mode of.
+     * @param mode {@link DcMotor.RunMode} to set the given motor to.
+     */
     public void setRunMode(Motor motor, DcMotor.RunMode mode) {
         switch (motor) {
             case FRONT_LEFT:
@@ -166,6 +212,12 @@ public class Robot {
         }
     }
 
+    /**
+     * Sets target position for the motor's encoders.
+     *
+     * @param motor {@link Motor} to set the target position of.
+     * @param pos Integer position to set the target of the encoder to.
+     */
     public void setTargetPosition(Motor motor, int pos) {
         switch (motor) {
             case FRONT_LEFT:
@@ -183,6 +235,12 @@ public class Robot {
         }
     }
 
+    /**
+     * Checks if the given motor is busy.
+     *
+     * @param motor {@link Motor} to check.
+     * @return True if the motor is busy, false if not busy.
+     */
     public boolean isBusy(Motor motor) {
         switch (motor) {
             case FRONT_LEFT:
@@ -198,6 +256,12 @@ public class Robot {
         }
     }
 
+    /**
+     * Gets the current position of the encoders.
+     *
+     * @param motor {@link Motor} to get position of.
+     * @return Returns integer of the encoder's position.
+     */
     public int getCurrentPosition(Motor motor) {
         switch (motor) {
             case FRONT_LEFT:
@@ -213,71 +277,16 @@ public class Robot {
         }
     }
 
-    public Orientation getAngularOrientation() {
-        return gyro.getOrient(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.DEGREES);
-    }
-
-    public void resetAngle() {
-        targetAngle = gyro.getOrient(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.DEGREES).firstAngle;
-        telemetry.addData("target", targetAngle);
-    }
-
-    private double getAngle() {
-        Orientation current = getAngularOrientation();
-
-        double angleDif = targetAngle - current.firstAngle;
-        double invertDirectionAngle = targetAngle - 180;
-
-        if (angleDif < -180) {
-            angleDif = 360 + angleDif;
-        }
-        if (angleDif > 180) {
-            angleDif = -360 + angleDif;
-        }
-
-        telemetry.addData("lastangles", lastAngles.firstAngle);
-        telemetry.addData("angleDif", angleDif);
-
-        return angleDif;
-    }
-
-    public double checkDirection() {
-
-        if (lastTime == -1) {
-            lastTime = startTime - 1;
-        }
-
-        double timeDif = period.milliseconds() - lastTime;
-
-        double correction, angle;
-
-//        double Ku = 3.16;
-        double Kp = -0.00128;
-        double Ki = 0;
-        double Kd = 0.01;
-
-        angle = getAngle();
-
-        if (angle > 360 || angle < -360) {
-            resetAngle();
-            angle = 0;
-        }
-
-        double p = Kp * angle;
-        double i = Ki * (angle * timeDif);
-        double d = Kd * (angle - previousError) / timeDif;
-
-        previousError = angle;
-
-        correction = p + i + d;
-        telemetry.addData("target", targetAngle);
-        telemetry.addData("Correction", correction);
-        telemetry.addData("Global Angle", angle);
-        return correction;
+    /**
+     * Gets the angle of the gyro.
+     *
+     * @return Float of gyro z axis.
+     */
+    public float getAngle() {
+        return gyro.getOrient(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.DEGREES).firstAngle;
     }
 
     public void start() {
-        this.startTime = period.milliseconds();
     }
 
     /* Initialize standard Hardware interfaces */
@@ -307,7 +316,7 @@ public class Robot {
         arm.set(hardwareMap.dcMotor.get("arm"));
         claw.set(hardwareMap.servo.get("claw"));
 
-        //Set directions for left and right motors
+        //Set directions for motors
         //F = Clockwise while looking at axle
         //R = Counter clockwise while looking at axle
         frontLeft.setDirection(MOTOR_R);

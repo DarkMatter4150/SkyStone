@@ -21,14 +21,38 @@ public class DeprecatedAutoRed extends LinearOpMode {
 
         waitForStart();
 
-        moveFoundation();
+//        foundation();
         //3 feet per second of drive @ speed = 1
-//        double startTime = timer.milliseconds();
-//        drive.setPower(1, 1, 0);
-//        while (timer.milliseconds() - startTime < 1000);
-//        drive.setPower( 0, 0, 0);
+        double startTime = timer.milliseconds();
+        drive.setPower(-1, 0, 0);
+        while (timer.milliseconds() - startTime < 1000);
+        drive.setPower( 0, 0, 0);
     }
 
+    public void foundation() {
+        drive.setPower(0, 1, 0);
+        double time = timer.milliseconds();
+        while (timer.milliseconds() - time < 2300 && opModeIsActive());
+        drive.setPower(1, 0, 0);
+        time = timer.milliseconds();
+        while (timer.milliseconds() - time < 1200 && opModeIsActive());
+        drive.setPower(0, 0, 0);
+        robot.setTabs(true);
+        drive.setPower(0, -1, 0);
+        time = timer.milliseconds();
+        while (timer.milliseconds() - time < 2300 && opModeIsActive());
+        drive.setPower(0, 1, 0);
+        robot.setTabs(false);
+        time = timer.milliseconds();
+        while (timer.milliseconds() - time < 200 && opModeIsActive());
+        drive.setPower(-1, 0, 0);
+        time = timer.milliseconds();
+        while (timer.milliseconds() - time < 2500 && opModeIsActive());
+        drive.setPower(0, 0, 0);
+        stop();
+    }
+
+    @Deprecated
     public void moveFoundation() {
         drive.setPower(-1, 0, -0.1f);
         double time = timer.milliseconds();

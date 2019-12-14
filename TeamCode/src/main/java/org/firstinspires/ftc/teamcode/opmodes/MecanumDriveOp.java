@@ -36,7 +36,6 @@ public class MecanumDriveOp extends OpMode {
     public void init() {
         //Set hardwaremaps for left and right motors
         robot.init(hardwareMap);
-        robot.resetAngle();
 
         //Clear telemetry
         telemetry.clearAll();
@@ -85,13 +84,12 @@ public class MecanumDriveOp extends OpMode {
                 telemetry.addData("sticks moving it", "");
                 if (rightTrigger1 != 0 || leftTrigger1 != 0) {
                     turnPower = rightTrigger1 - leftTrigger1;
-                    robot.resetAngle();
                 } else {
-                    turnPower = 0;//(float)robot.checkDirection();
+                    turnPower = 0;
                 }
-                output = drive.setPower(rightStick1x/2, leftStick1y/2, turnPower/2);
+                output = drive.setPower(rightStick1x/2, leftStick1y/2, -turnPower/2);
             } else {
-                output = drive.setPower(0, 0, 0);//(float)robot.checkDirection());
+                output = drive.setPower(0, 0, 0);
                 telemetry.addData("moving itself", "");
             }
         } else {
@@ -100,13 +98,12 @@ public class MecanumDriveOp extends OpMode {
                 telemetry.addData("sticks moving it", "");
                 if (rightTrigger1 != 0 || leftTrigger1 != 0) {
                     turnPower = rightTrigger1 - leftTrigger1;
-                    robot.resetAngle();
                 } else {
-                    turnPower = 0;//(float)robot.checkDirection();
+                    turnPower = 0;
                 }
                 output = drive.setPower(rightStick1x, leftStick1y, turnPower);
             } else {
-                output = drive.setPower(0, 0, 0);//(float)robot.checkDirection());
+                output = drive.setPower(0, 0, 0);
                 telemetry.addData("moving itself", "");
             }
         }
@@ -131,7 +128,6 @@ public class MecanumDriveOp extends OpMode {
         robot.setWheelIntake(leftTrigger2-rightTrigger2);
 
         //Arm
-//        robot.setArmPower(leftStick2y/2);
         robot.moveArm(leftStick2y);
 
         //Telemetry
@@ -145,10 +141,6 @@ public class MecanumDriveOp extends OpMode {
         telemetry.addData("BR Power Float", robot.getPower(Robot.Motor.BACK_RIGHT));
         telemetry.addData("Claw Pos", robot.getClawPos());
         telemetry.addData("slow?", slow);
-        RobotLog.i(robot.tag(NAME), "FL " + output[0]);
-        RobotLog.i(robot.tag(NAME), "FR " + output[1]);
-        RobotLog.i(robot.tag(NAME), "BL " + output[2]);
-        RobotLog.i(robot.tag(NAME), "BR " + output[3]);
     }
 
     @Override

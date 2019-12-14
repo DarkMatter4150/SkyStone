@@ -3,10 +3,14 @@ package org.firstinspires.ftc.teamcode.field;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Field class containing a HashMap of all of the different field objects on the field. Use this to build the field for use in autonomous.
+ */
 public class Field {
 
     private Map<String, FieldObject> fieldObjects;
 
+    /* Constructor */
     public Field() {
         this.fieldObjects = new HashMap<>();
 
@@ -40,14 +44,31 @@ public class Field {
         fieldObjects.put(midLine.getName(), midLine);
     }
 
+    /**
+     * Adds an object to the HashMap.
+     *
+     * @param name Name of the object.
+     * @param object {@link FieldObject} to add to the HashMap.
+     */
     public void addObject(String name, FieldObject object) {
         fieldObjects.put(name, object);
     }
 
+    /**
+     * Removes an object from the map using the name.
+     *
+     * @param name Name of the object to remove.
+     */
     public void removeObject(String name) {
         fieldObjects.remove(name);
     }
 
+    /**
+     * Gets an object from the HashMap.
+     *
+     * @param name Name of the object to return.
+     * @return Returns the {@link FieldObject} with the given name.
+     */
     public FieldObject getObject(String name) {
         return fieldObjects.get(name);
     }

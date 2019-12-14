@@ -16,52 +16,92 @@ public class EncoderDrive {
     private ElapsedTime runtime = new ElapsedTime();
 
     private static final double COUNTS_PER_MOTOR_REV = 1120;
-    private static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
+    private static final double DRIVE_GEAR_REDUCTION = 1.0;      // This is < 1.0 if geared UP
     private static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
     private static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * Math.PI);
     private static final float DRIVE_SPEED = 1f;
 
     private static final double TAU = 2 * Math.PI;
+//    public final static float RADIUS = 25.456f;
 
+    /**
+     * Constructor. Needs the {@link Robot} and {@link RobotObject} objects from the autonomous
+     * program so that it can drive.
+     *
+     * @param robot {@link Robot} object used for getting the motors.
+     * @param robotObject {@link RobotObject} object used for getting the robot's position.
+     */
     public EncoderDrive(Robot robot, RobotObject robotObject) {
         this.robot = robot;
         this.robotObject = robotObject;
     }
 
-    public Data getDriveMatrix(FieldObject destination,
-                                 float xOffset, float yOffset, float rotationDegrees) {
+    /**
+     * Creates a drive matrix for the wheels to know how far to travel. Used for the drive method.
+     * Uses X and Y Coordinates for the destination.
+     *
+     * @param destX           X Coordinate that you want to go to. Calculated against center of robot.
+     * @param destY           Y Coordinate that you want to go to. Calculated against center of robot.
+     * @param rotationDegrees How many degrees you want to rotate.
+     * @return {@link Data} object containing telemetry data and the drive matrix for the drive method.
+     */
+    public Data getDriveMatrix(float destX, float destY, float rotationDegrees) {
+        return matrix(destX, destY, 0, 0, rotationDegrees);
+    }
 
+    /**
+     * Creates a drive matrix for the wheels to know how far to travel. Used for the drive method.
+     * Uses a {@link FieldObject} to get the X and Y.
+     *
+     * @param destination     {@link FieldObject} used to find the coordinates of where you want the robot to go. Calculated against center of robot and object, use offsets to change that.
+     * @param xOffset         Offset used to move the destination X coordinate calculated after rotation. (If 0 the destination X will be the center of the object)
+     * @param yOffset         Offset used to move the destination Y coordinate calculated after rotation. (If 0 the destination Y will be the center of the object)
+     * @param rotationDegrees How many degrees you want to rotate.
+     * @return {@link Data} object containing telemetry data and the drive matrix for the drive method.
+     */
+    public Data getDriveMatrix(FieldObject destination, float xOffset, float yOffset, float rotationDegrees) {
+        // destX and destY are the centers of the destination field object.
+        float destX = destination.getX() + (destination.getWidth() / 2);
+        float destY = destination.getY() + (destination.getLength() / 2);
+
+        return matrix(destX, destY, xOffset, yOffset, rotationDegrees);
+    }
+
+    /**
+     * Creates a drive matrix for the wheels to know how far to travel. Used for the drive method.
+     *
+     * @param x               X coordinate of destination to calculate the distance needed to travel. Calculated against center of robot.
+     * @param y               Y coordinate of destination to calculate the distance needed to travel. Calculated against center of robot.
+     * @param xOffset         Offset used to move the destination X coordinate calculated after rotation. (If 0 the destination X will be the x coordinate)
+     * @param yOffset         Offset used to move the destination Y coordinate calculated after rotation. (If 0 the destination Y will be the y coordinate
+     * @param rotationDegrees How many degrees you want to rotate.
+     * @return Returns {@link Data} object with telemetry and the drive matrix.
+     */
+    private Data matrix(float x, float y, float xOffset, float yOffset, float rotationDegrees) {
+        // Sets robot to run with encoders.
         robot.setRunMode(Robot.Motor.FRONT_LEFT, DcMotor.RunMode.RUN_USING_ENCODER);
         robot.setRunMode(Robot.Motor.FRONT_RIGHT, DcMotor.RunMode.RUN_USING_ENCODER);
         robot.setRunMode(Robot.Motor.BACK_LEFT, DcMotor.RunMode.RUN_USING_ENCODER);
         robot.setRunMode(Robot.Motor.BACK_RIGHT, DcMotor.RunMode.RUN_USING_ENCODER);
 
-        float destL = destination.getLength();
-        float destW = destination.getWidth();
-        float destX = destination.getX();
-        float destY = destination.getY();
-        float[] destTopLeft = {destX, destY + destL};
-        float[] destTopRight = {destX + destW, destY + destL};
-        float[] destBottomLeft = {destX, destY};
-        float[] destBottomRight = {destX + destW, destY};
-
+        // Sets up variables for the robot's center position.
         float robotL = robotObject.getLength();
         float robotW = robotObject.getWidth();
         float robotX = robotObject.getX();
         float robotY = robotObject.getY();
         float[] robotTopRight = {robotX + robotW, robotY + robotL};
         float[] robotBottomLeft = {robotX, robotY};
-
         float robotCenterX = (robotBottomLeft[0] + robotTopRight[0]) / 2;
         float robotCenterY = (robotBottomLeft[1] + robotTopRight[1]) / 2;
-        float[] robotCenter = {robotCenterX, robotCenterY};
 
+        // Calculates the angle between the robot and the destination using trig.
         float robotangle = this.robotObject.getRotation();
-        float xCoord = (destBottomLeft[0] - robotBottomLeft[0]);
-        float yCoord = (destBottomLeft[1] - robotBottomLeft[1]);
-        double angle = Math.atan((destBottomLeft[1] - robotBottomLeft[1]) / (destBottomLeft[0] - robotBottomLeft[0]));
+        float xCoord = (x - robotCenterX);
+        float yCoord = (y - robotCenterY);
+        double angle = Math.atan((yCoord) / (xCoord));
         double destangle;
+        // Finds what quadrant the destination is and gets accurate angle measurements.
         if (xCoord > 0 && yCoord > 0) {
             destangle = angle;
         } else if (xCoord < 0 && yCoord > 0) {
@@ -80,52 +120,29 @@ public class EncoderDrive {
             destangle = 0;
         }
 
-        double theta = Math.toRadians(destangle - robotangle + 90);
-        double c = Math.cos(theta);
-        double s = Math.sin(theta);
+        // Math to get the distance between the robot and the destination.
+        float a = robotCenterX - x;
+        float b = robotCenterY - y;
+        float a2 = a*a;
+        float b2 = b*b;
+        float radius = toFloat(Math.sqrt(a2 + b2));
 
-        float xInRelation1 = destBottomLeft[0] - robotCenter[0];
-        float yInRelation1 = destBottomLeft[1] - robotCenter[1];
-        float xInRelation2 = destBottomRight[0] - robotCenter[0];
-        float yInRelation2 = destBottomRight[1] - robotCenter[1];
-        float xInRelation3 = destTopLeft[0] - robotCenter[0];
-        float yInRelation3 = destTopLeft[1] - robotCenter[1];
-        float xInRelation4 = destTopRight[0] - robotCenter[0];
-        float yInRelation4 = destTopRight[1] - robotCenter[1];
+        // Uses the polar coordinate system to rotate the destination around the robot to match it up as if the robot was facing up.
+        float theta = toFloat(destangle - robotangle);
+        float xInches = toFloat(radius * Math.cos(Math.toRadians(theta + 90)));
+        float yInches = toFloat(radius * Math.sin(Math.toRadians(theta + 90)));
 
-        float newX = Float.valueOf(String.valueOf((xInRelation1 * c) - (yInRelation1 * s))) + robotCenter[0];
-        float newY = Float.valueOf(String.valueOf((yInRelation1 * c) + (xInRelation1 * s))) + robotCenter[1];
-
-        destTopLeft[0] = Float.valueOf(String.valueOf((xInRelation3 * c) - (yInRelation3 * s))) + robotCenter[0];
-        destTopLeft[1] = Float.valueOf(String.valueOf((yInRelation3 * c) + (xInRelation3 * s))) + robotCenter[1];
-
-        destTopRight[0] = Float.valueOf(String.valueOf((xInRelation2 * c) - (yInRelation2 * s))) + robotCenter[0];
-        destTopRight[1] = Float.valueOf(String.valueOf((yInRelation2 * c) + (xInRelation2 * s))) + robotCenter[1];
-
-        destBottomLeft[0] = newX;
-        destBottomLeft[1] = newY;
-
-        destBottomRight[0] = Float.valueOf(String.valueOf((xInRelation4 * c) - (yInRelation4 * s))) + robotCenter[0];
-        destBottomRight[1] = Float.valueOf(String.valueOf((yInRelation4 * c) + (xInRelation4 * s))) + robotCenter[1];
-
-        float destCenterXNew = (destBottomLeft[0] + destTopRight[0]) / 2;
-        float destCenterYNew = (destBottomLeft[1] + destTopRight[1]) / 2;
-
-        float robotCenterXNew = (robotBottomLeft[0] + robotTopRight[0]) / 2;
-        float robotCenterYNew = (robotBottomLeft[1] + robotTopRight[1]) / 2;
-
-        float gotoX = destCenterXNew + xOffset;
-        float gotoY = destCenterYNew + yOffset;
-
-        float xInches = gotoX - robotCenterXNew;
-        float yInches = gotoY - robotCenterYNew;
-
-        float[] teledata = {Float.valueOf(Double.toString(c)), Float.valueOf(Double.toString(s)), destBottomLeft[1], destTopRight[1], destBottomRight[1], destTopLeft[1]};//robotBottomLeft[0], robotBottomLeft[1], gotoX, gotoY, Float.valueOf(String.valueOf(Math.toDegrees(theta)))};
+        //Offset application.
+        xInches += xOffset;
+        yInches += yOffset;
 
         //TODO: figure out rotating (done i think, just test)
-        //formula for arc length (degrees): theta/360 * tau * radius
-        float zInches = (float)( (rotationDegrees / 360) * (TAU * 25.4558) );
 
+        // Calculates the distance to rotate.
+        //formula for arc length (degrees): theta/360 * tau * radius
+        float zInches = (float) ((rotationDegrees / 360) * (TAU * 25.4558));
+
+        // Creates x and y matrices to be used to find how far each wheel should travel.
         Matrix xMatrix = new Matrix(2, 2);
         float[] driveX = {1, -1, -1, 1};
         xMatrix.setValues(driveX);
@@ -133,12 +150,15 @@ public class EncoderDrive {
         float[] driveY = {1, 1, 1, 1};
         yMatrix.setValues(driveY);
 
+        // Scales the unit matrices by how far it needs to travel in the x and y axis.
         xMatrix.scalar(xInches);
         yMatrix.scalar(yInches);
+        // MatrixHandler used to combine the x and y matrices into a final matrix (fin).
         MatrixHandler handler = new MatrixHandler(xMatrix, yMatrix);
         Matrix xy = handler.addMatrices();
         Matrix fin = xy;
 
+        // Adds in the z matrix if the rotation degrees is not zero, meaning we want the robot to rotate.
         if (rotationDegrees != 0) {
             Matrix zMatrix = new Matrix(2, 2);
             float[] driveZ = {1, -1, 1, -1};
@@ -148,26 +168,26 @@ public class EncoderDrive {
             fin = xyzHandler.addMatrices();
         }
 
-        //Float.valueOf(String.valueOf((xInRelation1 * c) - (yInRelation1 * s))) + robotCenter[0];
+        // Updates the robot's position to where it will be travelling to.
+        robotObject.addRotation(rotationDegrees);
+        robotObject.setX(x - 9);
+        robotObject.setY(y - 9);
 
-        double c2 = Math.cos(-theta);
-        double s2 = Math.sin(-theta);
+        // Float array full of telemetry data to output to telemetry. Used for debugging.
+        float[] teledata = {};
 
-        float xRelation = gotoX - robotCenterX;
-        float yRelation = gotoY - robotCenterY;
-        float newPosX = Float.valueOf(String.valueOf((xRelation * c2) - (yRelation * s2))) + robotCenter[0];
-        float newPosY = Float.valueOf(String.valueOf((yRelation * c2) + (xRelation * s2))) + robotCenter[1];
-
-        robotObject.setX(newPosX - 9);
-        robotObject.setY(newPosY - 9);
-        float robotDegrees = robotObject.getRotation();
-        robotObject.setRotation(robotDegrees + rotationDegrees);
-
+        // Creates Data object to return.
         return new Data(teledata, fin);
     }
 
+    /**
+     * Takes a matrix and drives the robot using it. Shows the encoder positions and targets in telemetry.
+     *
+     * @param fin {@link Matrix} used to tell how far each wheel should travel. 2x2 only.
+     * @return Array of ints containing the four targets for each wheel.
+     */
     public int[] drive(Matrix fin) {
-
+        // Instantiate target variables.
         int frontLeftTarget;
         int frontRightTarget;
         int backLeftTarget;
@@ -176,8 +196,8 @@ public class EncoderDrive {
         // Determine new target position, and pass to motor controller
         frontLeftTarget = robot.getCurrentPosition(Robot.Motor.FRONT_LEFT) + (int) (fin.getValue(0, 0) * COUNTS_PER_INCH);
         frontRightTarget = robot.getCurrentPosition(Robot.Motor.FRONT_RIGHT) + (int) (fin.getValue(1, 0) * COUNTS_PER_INCH);
-        backLeftTarget = robot.getCurrentPosition(Robot.Motor.FRONT_RIGHT) + (int) (fin.getValue(0, 1) * COUNTS_PER_INCH);
-        backRightTarget = robot.getCurrentPosition(Robot.Motor.FRONT_RIGHT) + (int) (fin.getValue(1, 1) * COUNTS_PER_INCH);
+        backLeftTarget = robot.getCurrentPosition(Robot.Motor.BACK_LEFT) + (int) (fin.getValue(0, 1) * COUNTS_PER_INCH);
+        backRightTarget = robot.getCurrentPosition(Robot.Motor.BACK_RIGHT) + (int) (fin.getValue(1, 1) * COUNTS_PER_INCH);
         robot.setTargetPosition(Robot.Motor.FRONT_LEFT, frontLeftTarget);
         robot.setTargetPosition(Robot.Motor.FRONT_RIGHT, frontRightTarget);
         robot.setTargetPosition(Robot.Motor.BACK_LEFT, backLeftTarget);
@@ -188,23 +208,27 @@ public class EncoderDrive {
         robot.setRunMode(Robot.Motor.FRONT_RIGHT, DcMotor.RunMode.RUN_TO_POSITION);
         robot.setRunMode(Robot.Motor.BACK_LEFT, DcMotor.RunMode.RUN_TO_POSITION);
         robot.setRunMode(Robot.Motor.BACK_RIGHT, DcMotor.RunMode.RUN_TO_POSITION);
-        // reset the timeout time and start motion.
+
+        // Reset the timeout time and start motion.
         runtime.reset();
         robot.setPower(Robot.Motor.FRONT_LEFT, DRIVE_SPEED);
         robot.setPower(Robot.Motor.FRONT_RIGHT, DRIVE_SPEED);
         robot.setPower(Robot.Motor.BACK_LEFT, DRIVE_SPEED);
         robot.setPower(Robot.Motor.BACK_RIGHT, DRIVE_SPEED);
 
-        return new int[]{frontLeftTarget, frontRightTarget, backLeftTarget, backRightTarget};
+        // Return target array for tick method.
+        return new int[] {frontLeftTarget, frontRightTarget, backLeftTarget, backRightTarget};
     }
 
-    public void tick(Telemetry telemetry, int[] targets, Matrix matrix, float[] teledata) {
-        // keep looping while we are still active, and there is time left, and both motors are running.
-        // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
-        // its target position, the motion will stop.  This is "safer" in the event that the robot will
-        // always end the motion as soon as possible.
-        // However, if you require that BOTH motors have finished their moves before the robot continues
-        // onto the next step, use (isBusy() || isBusy()) in the loop test.
+    /**
+     * Method to be looped, used to update telemetry and check if the robot has finished moving.
+     *
+     * @param telemetry {@link Telemetry} object to write the teledata to telemetry.
+     * @param targets Array of integers containing the targets for each wheel to travel to.
+     * @param teledata Array of floats to be outputted to telemetry. Used for debugging.
+     */
+    public void tick(Telemetry telemetry, int[] targets, float[] teledata) {
+        // Gets variables from the targets array.
         int frontLeftTarget = targets[0];
         int frontRightTarget = targets[1];
         int backLeftTarget = targets[2];
@@ -221,15 +245,19 @@ public class EncoderDrive {
                 robot.getCurrentPosition(Robot.Motor.FRONT_RIGHT),
                 robot.getCurrentPosition(Robot.Motor.BACK_LEFT),
                 robot.getCurrentPosition(Robot.Motor.BACK_RIGHT));
-        telemetry.addData("Drive", matrix.toString());
 
+        // Loops through teledata to display.
         for (int i = 0; i < teledata.length; i++) {
             telemetry.addData("data" + i, teledata[i]);
         }
 
+        // Updates telemetry.
         telemetry.update();
     }
 
+    /**
+     * Stop method stops all power to the motors and turns off encoders.
+     */
     public void stop() {
         // Stop all motion;
         robot.setPower(Robot.Motor.FRONT_LEFT, 0);
@@ -244,24 +272,39 @@ public class EncoderDrive {
         robot.setRunMode(Robot.Motor.BACK_RIGHT, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
+    /**
+     * Function to pick up a block into the intake slot.
+     */
     public void pickUpBlock() {
+        // Starts driving forward.
         robot.setPower(Robot.Motor.FRONT_LEFT, 1);
         robot.setPower(Robot.Motor.FRONT_RIGHT, 1);
         robot.setPower(Robot.Motor.BACK_LEFT, 1);
         robot.setPower(Robot.Motor.BACK_RIGHT, 1);
 
+        // Starts wheel intake.
         robot.setWheelIntake(1);
     }
 
+    /**
+     * Function to drop a block from the intake slot.
+     */
     public void dropBlock() {
+        // Starts driving backwards.
         robot.setPower(Robot.Motor.FRONT_LEFT, -1);
         robot.setPower(Robot.Motor.FRONT_RIGHT, -1);
         robot.setPower(Robot.Motor.BACK_LEFT, -1);
         robot.setPower(Robot.Motor.BACK_RIGHT, -1);
 
+        // Starts intake in reverse.
         robot.setWheelIntake(-1);
     }
 
+    /**
+     * Reverts back to its original position. Essentially an inverse pick up/drop of the block without running the intake.
+     *
+     * @param par0: A string to tell it what to revert, either "grab" or "drop".
+     */
     public void revert(String par0) {
         if (par0.equals("grab")) {
             robot.setPower(Robot.Motor.FRONT_LEFT, -1);
@@ -276,6 +319,19 @@ public class EncoderDrive {
         }
     }
 
+    /**
+     * Turns a double into a float.
+     *
+     * @param a: Double to be transformed.
+     * @return Returns a float with the same value as the double.
+     */
+    private static float toFloat(double a) {
+        return Float.valueOf(String.valueOf(a));
+    }
+
+    /**
+     * Data class to contain both a {@link Matrix} and a float array for telemetry.
+     */
     public class Data {
 
         public float[] teledata;

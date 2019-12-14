@@ -21,12 +21,36 @@ public class DeprecatedAutoBlue extends LinearOpMode {
 
         waitForStart();
 
-        moveFoundation();
-        //3 feet per second of drive @ speed = 1
-//        double startTime = timer.milliseconds();
-//        drive.setPower(1, 1, 0);
-//        while (timer.milliseconds() - startTime < 1000);
-//        drive.setPower( 0, 0, 0);
+//        moveFoundation();
+//        foundation();
+//        //3 feet per second of drive @ speed = 1
+        double startTime = timer.milliseconds();
+        drive.setPower(1, 0, 0);
+        while (timer.milliseconds() - startTime < 1000);
+        drive.setPower( 0, 0, 0);
+    }
+
+    public void foundation() {
+        drive.setPower(0, 1, 0);
+        double time = timer.milliseconds();
+        while (timer.milliseconds() - time < 2000 && opModeIsActive());
+        drive.setPower(-1, 0, 0);
+        time = timer.milliseconds();
+        while (timer.milliseconds() - time < 1200 && opModeIsActive());
+        drive.setPower(0, 0, 0);
+        robot.setTabs(false);
+        drive.setPower(0, -1, 0);
+        time = timer.milliseconds();
+        while (timer.milliseconds() - time < 1750 && opModeIsActive());
+        drive.setPower(0, 1, 0);
+        robot.setTabs(true);
+        time = timer.milliseconds();
+        while (timer.milliseconds() - time < 200 && opModeIsActive());
+        drive.setPower(1, 0, 0);
+        time = timer.milliseconds();
+        while (timer.milliseconds() - time < 2500 && opModeIsActive());
+        drive.setPower(0, 0, 0);
+        stop();
     }
 
     public void moveFoundation() {
@@ -40,9 +64,19 @@ public class DeprecatedAutoBlue extends LinearOpMode {
         drive.setPower(0,0,0);
         robot.setTabs(false);
         drive.setPower(0, 1, 0);
-        while (timer.milliseconds() - startTime < (3500) && opModeIsActive());
+        while (timer.milliseconds() - startTime < (2000) && opModeIsActive());
         drive.setPower(0, 0, 0);
         robot.setTabs(true);
-        while (timer.milliseconds() - startTime < (5000) && opModeIsActive());
+        time = timer.milliseconds();
+        while (timer.milliseconds() - time < (100) && opModeIsActive());
+        drive.setPower(0, 1, 0);
+        time = timer.milliseconds();
+        while (timer.milliseconds() - time < (500) && opModeIsActive());
+        drive.setPower(-1, 0, 0);
+        time = timer.milliseconds();
+        while (timer.milliseconds() - time < (450) && opModeIsActive());
+        drive.setPower(0, 0, 1);
+        time = timer.milliseconds();
+        while (timer.milliseconds() - time < (1200) && opModeIsActive());
     }
 }
