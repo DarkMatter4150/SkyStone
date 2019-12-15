@@ -2,12 +2,10 @@ package org.firstinspires.ftc.teamcode.breakout;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-
 import static org.firstinspires.ftc.teamcode.breakout.BreakoutMotor.Direction.MOTOR_F;
 import static org.firstinspires.ftc.teamcode.breakout.BreakoutMotor.Direction.MOTOR_R;
 
@@ -135,10 +133,11 @@ public class Robot {
      * @param power Power of the motor from -1 to 1.
      */
     public void moveArm(float power) {
-        int target = arm.getCurrentPosition() + (int)(power*52);
+        int currentPosition = arm.getCurrentPosition();
+        int target = currentPosition + (int)(power*52);
         arm.setTargetPosition(target);
         arm.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
-        if (target < arm.getCurrentPosition()) {
+        if (target < currentPosition) {
             arm.setPower(-1);
         } else {
             arm.setPower(1);
@@ -300,6 +299,7 @@ public class Robot {
         telemetry.update();
         gyro.calibrate();
         telemetry.clearAll();
+        telemetry.update();
 
         // Define and Initialize Motors
         frontLeft.set(hardwareMap.dcMotor.get("frontLeft"));

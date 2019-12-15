@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.teamcode.breakout.EncoderDrive;
 import org.firstinspires.ftc.teamcode.breakout.Robot;
 import org.firstinspires.ftc.teamcode.field.Field;
@@ -29,7 +28,7 @@ public class RedAutonomous extends LinearOpMode {
     @Override
     public void runOpMode() {
         // Creates robotObject and encoderDrive to be used later. Set the starting position of the robot here.
-        RobotObject robotObject = new RobotObject(126, 102, 18, 18, 0);
+        RobotObject robotObject = new RobotObject(135, 111, 18, 18, 0);
         encoderDrive = new EncoderDrive(robot, robotObject);
 
         /*
@@ -97,7 +96,7 @@ public class RedAutonomous extends LinearOpMode {
             while (opModeIsActive() && (timer.milliseconds() - time < movetimer) &&
                     (robot.isBusy(Robot.Motor.FRONT_LEFT) || robot.isBusy(Robot.Motor.FRONT_RIGHT) ||
                             robot.isBusy(Robot.Motor.BACK_LEFT) || robot.isBusy(Robot.Motor.BACK_RIGHT))) {
-                encoderDrive.tick(telemetry, targets, driveMatrix.teledata);
+                encoderDrive.tick(telemetry, targets, driveMatrix.telemetryData);
             }
             encoderDrive.stop();
             sleep(waitMilliseconds);
@@ -123,7 +122,7 @@ public class RedAutonomous extends LinearOpMode {
             while (opModeIsActive() && (timer.milliseconds() - time < movetimer) &&
                     (robot.isBusy(Robot.Motor.FRONT_LEFT) || robot.isBusy(Robot.Motor.FRONT_RIGHT) ||
                             robot.isBusy(Robot.Motor.BACK_LEFT) || robot.isBusy(Robot.Motor.BACK_RIGHT))) {
-                encoderDrive.tick(telemetry, targets, driveMatrix.teledata);
+                encoderDrive.tick(telemetry, targets, driveMatrix.telemetryData);
             }
             encoderDrive.stop();
             sleep(waitMilliseconds);

@@ -77,35 +77,31 @@ public class MecanumDriveOp extends OpMode {
 
         //Move the motors//
         float[] output;
-        boolean stickDeadZone = leftStick1y >= 0.1 || leftStick1y <= -0.1 || rightStick1x >= 0.1 || rightStick1x <= -0.1 || rightTrigger1 != 0 || leftTrigger1 != 0;
+//        boolean stickDeadZone = leftStick1y >= 0.1 || leftStick1y <= -0.1 || rightStick1x >= 0.1 || rightStick1x <= -0.1 || rightTrigger1 != 0 || leftTrigger1 != 0;
         if (slow) {
-            if (stickDeadZone) {
+//            if (stickDeadZone) {
                 float turnPower;
-                telemetry.addData("sticks moving it", "");
                 if (rightTrigger1 != 0 || leftTrigger1 != 0) {
                     turnPower = rightTrigger1 - leftTrigger1;
                 } else {
                     turnPower = 0;
                 }
                 output = drive.setPower(rightStick1x/2, leftStick1y/2, -turnPower/2);
-            } else {
-                output = drive.setPower(0, 0, 0);
-                telemetry.addData("moving itself", "");
-            }
+//            } else {
+//                output = drive.setPower(0, 0, 0);
+//            }
         } else {
-            if (stickDeadZone) {
+//            if (stickDeadZone) {
                 float turnPower;
-                telemetry.addData("sticks moving it", "");
                 if (rightTrigger1 != 0 || leftTrigger1 != 0) {
                     turnPower = rightTrigger1 - leftTrigger1;
                 } else {
                     turnPower = 0;
                 }
                 output = drive.setPower(rightStick1x, leftStick1y, turnPower);
-            } else {
-                output = drive.setPower(0, 0, 0);
-                telemetry.addData("moving itself", "");
-            }
+//            } else {
+//                output = drive.setPower(0, 0, 0);
+//            }
         }
 
         if (aButton && timer.milliseconds() - tabTimer > 250) {
