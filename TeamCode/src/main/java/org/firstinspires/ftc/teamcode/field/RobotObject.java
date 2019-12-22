@@ -21,6 +21,20 @@ public class RobotObject extends FieldObject {
     }
 
     /**
+     * Gets the x position of the center of the {@link RobotObject}.
+     *
+     * @return float value containing the center x position.
+     */
+    public float getCenterX() { return (this.getX()) + (this.getWidth()/2); }
+
+    /**
+     * Gets the y position of the center of the {@link RobotObject}.
+     *
+     * @return float value containing the center y position.
+     */
+    public float getCenterY() { return (this.getY()) + (this.getLength()/2); }
+
+    /**
      * Method to get the rotation of the robot (Direction it is facing in degrees).
      *
      * @return Returns rotation in degrees.

@@ -15,11 +15,9 @@ import static org.firstinspires.ftc.teamcode.breakout.BreakoutMotor.Direction.MO
 /**
  * This class is used for the main game to drive the robot using the controllers.
  **/
-@TeleOp(name = "Mecanum", group = "Pushbot")
+@TeleOp(name = "Mecanum Bumper Intake Opening", group = "Pushbot")
 
-public class MecanumDriveOp extends OpMode {
-
-    private static final String NAME = "Mecanum Drive Op";
+public class MecanumDriveOpManualServos extends OpMode {
 
     //Motor objects
     private Robot robot = new Robot(telemetry);
@@ -77,21 +75,15 @@ public class MecanumDriveOp extends OpMode {
 
         //Move the motors//
         float[] output;
-//        boolean stickDeadZone = leftStick1y >= 0.1 || leftStick1y <= -0.1 || rightStick1x >= 0.1 || rightStick1x <= -0.1 || rightTrigger1 != 0 || leftTrigger1 != 0;
         if (slow) {
-//            if (stickDeadZone) {
                 float turnPower;
                 if (rightTrigger1 != 0 || leftTrigger1 != 0) {
                     turnPower = rightTrigger1 - leftTrigger1;
                 } else {
                     turnPower = 0;
                 }
-                output = drive.setPower(rightStick1x/2, leftStick1y/2, -turnPower/2);
-//            } else {
-//                output = drive.setPower(0, 0, 0);
-//            }
+                output = drive.setPower(rightStick1x/2, leftStick1y/2, turnPower/2);
         } else {
-//            if (stickDeadZone) {
                 float turnPower;
                 if (rightTrigger1 != 0 || leftTrigger1 != 0) {
                     turnPower = rightTrigger1 - leftTrigger1;
@@ -99,9 +91,6 @@ public class MecanumDriveOp extends OpMode {
                     turnPower = 0;
                 }
                 output = drive.setPower(rightStick1x, leftStick1y, turnPower);
-//            } else {
-//                output = drive.setPower(0, 0, 0);
-//            }
         }
 
         if (aButton && timer.milliseconds() - tabTimer > 250) {
@@ -119,6 +108,12 @@ public class MecanumDriveOp extends OpMode {
         if (gamepad1.a && timer.milliseconds() - slowTimer > 250) {
             slow = !slow;
             slowTimer = timer.milliseconds();
+        }
+
+        if (gamepad2.right_bumper || gamepad2.left_bumper) {
+            robot.setIntakeServos(true);
+        } else {
+            robot.setIntakeServos(false);
         }
 
         robot.setWheelIntake(leftTrigger2-rightTrigger2);

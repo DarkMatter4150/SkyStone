@@ -4,11 +4,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.breakout.EncoderDrive;
 import org.firstinspires.ftc.teamcode.breakout.Robot;
 import org.firstinspires.ftc.teamcode.field.Field;
 import org.firstinspires.ftc.teamcode.field.FieldObject;
 import org.firstinspires.ftc.teamcode.field.RobotObject;
+import org.firstinspires.ftc.teamcode.matrix.Matrix;
 
 /**
  * Autonomous for starting on the red side.
@@ -18,6 +20,7 @@ public class RedAutonomous extends LinearOpMode {
 
     /* Declare OpMode members. */
     private Robot robot = new Robot(telemetry);   // Use a Pushbot's hardware
+    private RobotObject robotObject = new RobotObject(135, 111, 18, 18, 0);
     private ElapsedTime runtime = new ElapsedTime();
     private Field field = new Field();
     private EncoderDrive encoderDrive;
@@ -63,19 +66,59 @@ public class RedAutonomous extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        moveCoord(135, 120, 0, 1000, 1000);
-        moveCoord(126, 120, 0, 1000, 1000);
-        moveCoord(126, 111, 0, 1000, 1000);
-        moveCoord(135, 111, 0, 1000, 1000);
+//        moveCoord(135, 120, 0, 1000, 1000);
+//        moveCoord(126, 120, 0, 1000, 1000);
+//        moveCoord(126, 111, 0, 1000, 1000);
+//        moveCoord(135, 111, 0, 1000, 1000);
 
-//        moveTarget(field.getObject("r sky stones"), 0, 0, 0, 1000);
-//        grabBlock(1000);
-//        moveTarget(field.getObject("mid line"), -20, 12, 0, 0);
-//        moveTarget(field.getObject("mid line"), 20, 12, 0, 1000);
-//        dropBlock(1000);
+//        getFoundation();
+//        park();
+
+//        moveCoord(robotObject.getCenterX(), robotObject.getCenterY(), 180, 100, 10000);
+        move(18, -18);
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
+    }
+
+    /**
+     * Method used to park under the bridge
+     */
+    private void park() {
+        moveCoord(134, 72, 0, 0, 1000);
+    }
+
+    /**
+     * Method used to get the foundation, starting at x=135, y=111
+     */
+    private void getFoundation() {
+        moveCoord(135, 122.75f, 0, 100, 1000);
+        moveTarget(field.getObject("r foundation"), 18.25f, 0, 0, 100, 2000);
+        robot.setTabs(false);
+        pause(1000);
+        moveCoord(130, 122.75f, 0, 100, 2000);
+        robot.setTabs(true);
+        pause(1000);
+        moveCoord(130, 108, 0, 100, 1000);
+        moveCoord(104, 108, 0, 100, 1000);
+        robot.setTabs(false);
+        moveCoord(104, 108, 180, 100, 1000);
+        moveCoord(104, 120, 0, 100, 1000);
+        moveCoord(115, 120, 0, 100, 1000);
+        moveTarget(field.getObject("r bridge"), -5, 0, 0, 100, 2000);
+    }
+
+    private void move(float left, float right) {
+        if (opModeIsActive()) {
+            Matrix move = new Matrix(2, 2);
+            move.setValues(new float[] {left, right, left, right});
+            int[] targets = encoderDrive.drive(move);
+            while (opModeIsActive() &&
+                    (robot.isBusy(Robot.Motor.FRONT_LEFT) || robot.isBusy(Robot.Motor.FRONT_RIGHT) ||
+                            robot.isBusy(Robot.Motor.BACK_LEFT) || robot.isBusy(Robot.Motor.BACK_RIGHT))) {
+                encoderDrive.tick(telemetry, targets, new float[] {});
+            }
+        }
     }
 
     /**

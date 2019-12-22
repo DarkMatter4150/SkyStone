@@ -61,9 +61,10 @@ public class EncoderDrive {
      */
     public Data getDriveMatrix(FieldObject destination, float xOffset, float yOffset, float rotationDegrees) {
         // destX and destY are the centers of the destination field object.
-        float destX = destination.getX() + (destination.getWidth() / 2);
-        float destY = destination.getY() + (destination.getLength() / 2);
+        float destX = destination.getX() + (destination.getWidth() / 2); //86.5
+        float destY = destination.getY() + (destination.getLength() / 2); //122.75
 
+        //104.75
         return matrix(destX, destY, xOffset, yOffset, rotationDegrees);
     }
 
@@ -102,44 +103,21 @@ public class EncoderDrive {
         float robotAngle = this.robotObject.getRotation();
         float xCoordinate = (x - robotCenterX);
         float yCoordinate = (y - robotCenterY);
-        double angle = Math.atan((yCoordinate) / (xCoordinate));
-        double destinationAngle;
-        // Finds what quadrant the destination is and gets accurate angle measurements.
-        if (xCoordinate > 0 && yCoordinate > 0) {
-            destinationAngle = angle;
-        } else if (xCoordinate < 0 && yCoordinate > 0) {
-            destinationAngle = angle + 90;
-        } else if (xCoordinate < 0 && yCoordinate < 0) {
-            destinationAngle = angle + 180;
-        } else if (xCoordinate > 0 && yCoordinate < 0) {
-            destinationAngle = angle + 270;
-        } else if (xCoordinate == 0 && yCoordinate > 0) {
-            destinationAngle = 90;
-        } else if (yCoordinate == 0 && xCoordinate > 0) {
-            destinationAngle = 180;
-        } else if (xCoordinate == 0 && yCoordinate < 0) {
-            destinationAngle = 270;
-        } else {
-            destinationAngle = 0;
-        }
 
-        // Math to get the distance between the robot and the destination.
-        float a = robotCenterX - x;
-        float b = robotCenterY - y;
-        float a2 = a*a;
-        float b2 = b*b;
-        float radius = toFloat(Math.sqrt(a2 + b2));
+        // Gets the angle of the robot +90 and finds the cosine and sine of that angle
+        float rotateDegrees = robotAngle + 90;
+        float c = toFloat(Math.cos(Math.toRadians(rotateDegrees)));
+        float s = toFloat(Math.sin(Math.toRadians(rotateDegrees)));
 
-        // Uses the polar coordinate system to rotate the destination around the robot to match it up as if the robot was facing up.
-        float theta = toFloat(destinationAngle - robotAngle);
-        float xInches = toFloat(radius * Math.cos(Math.toRadians(theta + 90)));
-        float yInches = toFloat(radius * Math.sin(Math.toRadians(theta + 90)));
+        // Rotates the points to get the movement.
+        float xInches = toFloat(xCoordinate*c - yCoordinate*s);
+        float yInches = toFloat(xCoordinate*s - yCoordinate*c);
 
         //TODO: figure out rotating (done i think, just test)
 
         // Calculates the distance to rotate.
         // Formula for arc length (degrees): theta/360 * tau * radius
-        float zInches = (float) ((rotationDegrees / 360) * (TAU * RADIUS));
+        float zInches = rotationDegrees * 0.207407f;
 
         // Creates x and y matrices to be used to find how far each wheel should travel.
         Matrix xMatrix = new Matrix(2, 2);
@@ -173,7 +151,7 @@ public class EncoderDrive {
         robotObject.setY(y - 9);
 
         // Float array full of telemetry data to output to telemetry. Used for debugging.
-        float[] telemetryData = {};
+        float[] telemetryData = {x, y, xInches, yInches, robotX, robotY, /*radius, theta,*/ xCoordinate, yCoordinate};
 
         // Creates Data object to return.
         return new Data(telemetryData, fin);

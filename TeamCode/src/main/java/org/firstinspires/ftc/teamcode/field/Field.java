@@ -12,14 +12,16 @@ public class Field {
 
     /* Constructor */
     public Field() {
+        // Create HashMap for the objects.
         this.fieldObjects = new HashMap<>();
 
+        // Create all of the objects on the field.
         FieldObject redDepot = new FieldObject(0.0f, 0.0f, 24.0f, 24.0f, "r depot");
         FieldObject blueDepot = new FieldObject(10.0f, 0.0f, 24.0f, 24.0f, "b depot");
         FieldObject redSkyStones = new FieldObject(92.0f, 0.0f, 4.0f, 48.0f, "r sky stones");
         FieldObject blueSkyStones = new FieldObject(48.0f, 0.0f, 4.0f, 48.0f, "b sky stones");
-        FieldObject redFoundation = new FieldObject(96.75f, 140.0f, -18.5f, -34.5f, "r foundation");
-        FieldObject blueFoundation = new FieldObject(47.25f, 140.0f, 18.5f, -34.5f, "b foundation");
+        FieldObject redFoundation = new FieldObject(77.25f, 105.5f, 18.5f, 34.5f, "r foundation");
+        FieldObject blueFoundation = new FieldObject(48.25f, 105.5f, 18.5f, 34.5f, "b foundation");
         BuildSite redBuildSite = new BuildSite(120.0f, 120.0f, 24.0f, 24.0f, "r build site", true);
         BuildSite blueBuildSite = new BuildSite(0.0f, 120.0f, 24.0f, 24.0f, "b build site", false);
         FieldObject buildZone = new FieldObject(0.0f, 7.0f, 144.0f, 60.0f, "build zone");
@@ -28,20 +30,22 @@ public class Field {
         FieldObject blueBridge = new FieldObject(0.0f, 69.6f, 48.0f, 4.8f, "b bridge");
         FieldObject neutralBridge = new FieldObject(48.0f, 67.2f, 48.0f, 9.6f, "n bridge");
         FieldObject midLine = new FieldObject(0, 72, 144, 0, "mid line");
-        fieldObjects.put(redDepot.getName(), redDepot);
-        fieldObjects.put(blueDepot.getName(), blueDepot);
-        fieldObjects.put(redSkyStones.getName(), redSkyStones);
-        fieldObjects.put(blueSkyStones.getName(), blueSkyStones);
-        fieldObjects.put(redFoundation.getName(), redFoundation);
-        fieldObjects.put(blueFoundation.getName(), blueFoundation);
-        fieldObjects.put(redBuildSite.getName(), redBuildSite);
-        fieldObjects.put(blueBuildSite.getName(), blueBuildSite);
-        fieldObjects.put(buildZone.getName(), buildZone);
-        fieldObjects.put(loadingZone.getName(), loadingZone);
-        fieldObjects.put(redBridge.getName(), redBridge);
-        fieldObjects.put(blueBridge.getName(), blueBridge);
-        fieldObjects.put(neutralBridge.getName(), neutralBridge);
-        fieldObjects.put(midLine.getName(), midLine);
+
+        // Add all of the objects to the HashMap with their respective name.
+        addObject(redDepot.getName(), redDepot);
+        addObject(blueDepot.getName(), blueDepot);
+        addObject(redSkyStones.getName(), redSkyStones);
+        addObject(blueSkyStones.getName(), blueSkyStones);
+        addObject(redFoundation.getName(), redFoundation);
+        addObject(blueFoundation.getName(), blueFoundation);
+        addObject(redBuildSite.getName(), redBuildSite);
+        addObject(blueBuildSite.getName(), blueBuildSite);
+        addObject(buildZone.getName(), buildZone);
+        addObject(loadingZone.getName(), loadingZone);
+        addObject(redBridge.getName(), redBridge);
+        addObject(blueBridge.getName(), blueBridge);
+        addObject(neutralBridge.getName(), neutralBridge);
+        addObject(midLine.getName(), midLine);
     }
 
     /**

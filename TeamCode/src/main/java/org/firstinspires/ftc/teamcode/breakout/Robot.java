@@ -44,6 +44,18 @@ public class Robot {
         TabPos(double pos) { this.pos = pos; }
     }
 
+    /**
+     * Enum for the wheel intake servos, open and closed for each side
+     */
+    public enum IntakePos {
+        LEFT_OPEN(0.3d), LEFT_CLOSED(0.0d),
+        RIGHT_OPEN(0.3d), RIGHT_CLOSED(0.0d);
+
+        private double pos;
+
+        IntakePos(double pos) { this.pos = pos; }
+    }
+
     //Motors
     private BreakoutMotor frontLeft = new BreakoutMotor();
     private BreakoutMotor frontRight = new BreakoutMotor();
@@ -54,6 +66,8 @@ public class Robot {
     private BreakoutMotor arm = new BreakoutMotor();
 
     //Servos
+    private BreakoutServo intakeServoLeft = new BreakoutServo();
+    private BreakoutServo intakeServoRight = new BreakoutServo();
     private BreakoutServo tabLeft = new BreakoutServo();
     private BreakoutServo tabRight = new BreakoutServo();
     private BreakoutServo claw = new BreakoutServo();
@@ -92,6 +106,21 @@ public class Robot {
         } else {
             tabLeft.setPosition(TabPos.LEFT_CLOSED.pos);
             tabRight.setPosition(TabPos.RIGHT_CLOSED.pos);
+        }
+    }
+
+    /**
+     * Sets the wheel intake servos' positions based on the boolean input.
+     *
+     * @param open Boolean variable to open/close the intake.
+     */
+    public void setIntakeServos(boolean open) {
+        if (open) {
+            intakeServoLeft.setPosition(IntakePos.LEFT_OPEN.pos);
+            intakeServoRight.setPosition(IntakePos.RIGHT_OPEN.pos);
+        } else {
+            intakeServoLeft.setPosition(IntakePos.LEFT_CLOSED.pos);
+            intakeServoRight.setPosition(IntakePos.RIGHT_CLOSED.pos);
         }
     }
 
@@ -313,6 +342,9 @@ public class Robot {
         tabLeft.set(hardwareMap.servo.get("tabLeft"));
         tabRight.set(hardwareMap.servo.get("tabRight"));
 
+        intakeServoLeft.set(hardwareMap.servo.get("intakeLeft"));
+        intakeServoRight.set(hardwareMap.servo.get("intakeRight"));
+
         arm.set(hardwareMap.dcMotor.get("arm"));
         claw.set(hardwareMap.servo.get("claw"));
 
@@ -329,6 +361,8 @@ public class Robot {
 
         arm.setDirection(MOTOR_F);
 
+        intakeServoLeft.setDirection(BreakoutServo.Direction.SERVO_R);
+
         // Set all motors to zero power
         frontLeft.setPower(0);
         frontRight.setPower(0);
@@ -340,6 +374,9 @@ public class Robot {
 
         tabLeft.setPosition(TabPos.LEFT_OPEN.pos);
         tabRight.setPosition(TabPos.RIGHT_OPEN.pos);
+
+        intakeServoLeft.setPosition(IntakePos.LEFT_CLOSED.pos);
+        intakeServoRight.setPosition(IntakePos.RIGHT_CLOSED.pos);
 
         arm.setPower(0);
         claw.setPosition(ClawPos.OPEN.pos);

@@ -17,7 +17,6 @@ public class MotorConfusionTest extends OpMode {
     @Override
     public void init() {
         robot.init(hardwareMap);
-        robot.resetAngle();
 
         //Clear telemetry
         telemetry.clearAll();
