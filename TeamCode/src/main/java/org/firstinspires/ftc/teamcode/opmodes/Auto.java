@@ -14,15 +14,11 @@ import org.firstinspires.ftc.teamcode.field.FieldObject;
 import org.firstinspires.ftc.teamcode.field.RobotObject;
 import org.firstinspires.ftc.teamcode.matrix.Matrix;
 
-/**
- * Autonomous for starting on the red side.
- */
-//@Autonomous(name = "Red Autonomous", group = "Pushbot")
-public class RedAutonomous extends LinearOpMode {
+public class Auto extends LinearOpMode {
 
     /* Declare OpMode members. */
     private Robot robot = new Robot(telemetry);   // Use a Pushbot's hardware
-    private RobotObject robotObject = new RobotObject(135, 111, 18, 18, 0);
+    private RobotObject robotObject;
     private ElapsedTime runtime = new ElapsedTime();
     private Field field = new Field();
     private EncoderDrive encoderDrive;
@@ -69,27 +65,50 @@ public class RedAutonomous extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-//        moveCoord(135, 120, 0, 1000, 1000);
-//        moveCoord(126, 120, 0, 1000, 1000);
-//        moveCoord(126, 111, 0, 1000, 1000);
-//        moveCoord(135, 111, 0, 1000, 1000);
-
-//        getFoundation();
-        park();
-
-//        moveCoord(robotObject.getCenterX(), robotObject.getCenterY(), 180, 100, 10000);
-//        move(18, -18);
-
+        instructions();
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
     }
 
     /**
+     * Run this and pass in the new {@link RobotObject} for which side you're on.
+     * <p>
+     * Without this, it defaults to red side.
+     */
+    void resetRobotObject(RobotObject obj) {
+        robotObject = obj;
+        encoderDrive = new EncoderDrive(robot, robotObject);
+    }
+
+    /**
+     * Override this with instructions to do during autonomous
+     * <p>
+     * Methods used inside this are defined here and contain the specific move coordinates and objects
+     * for each of the moves. We will override this with separate methods for red and blue autonomous.
+     */
+    void instructions() {
+    }
+
+    /**
+     * rotating tests
+     */
+    void rotate() {
+        moveCoord(robotObject.getCenterX(), robotObject.getCenterY(), 180, 1000, 10000);
+    }
+
+    /**
      * Method used to park under the bridge
      */
-    private void park() {
+    void parkRed() {
         moveCoord(134, 72, 0, 0, 1000);
+    }
+
+    /**
+     * Method used to park under the blue bridge
+     */
+    void parkBlue() {
+        moveCoord(10, 72, 0, 0, 1000);
     }
 
     //TODO: test SkyStone code
@@ -97,7 +116,7 @@ public class RedAutonomous extends LinearOpMode {
     /**
      * Method used to get the SkyStone
      */
-    private void skyStones() {
+    void skyStonesRed() {
         moveCoord(135, 35);
         moveCoord(107, 35);
         moveCoord(107, 25);
@@ -120,7 +139,7 @@ public class RedAutonomous extends LinearOpMode {
     /**
      * Method used to get the second SkyStone
      */
-    private void skyStones2() {
+    void skyStones2Red() {
         moveCoord(135, 35);
         moveCoord(107, (skyStonePosition * 8) + 24);
         grabBlock(1000);
@@ -132,21 +151,21 @@ public class RedAutonomous extends LinearOpMode {
     /**
      * Method used to get the foundation, starting at x=135, y=111
      */
-    private void getFoundation() {
+    void getFoundationRed() {
         moveCoord(135, 122.75f, 0, 100, 1000);
-        moveTarget(field.getObject("r foundation"), 18.25f, 0, 0, 100, 2000);
+        moveTarget(field.getObject("r foundation"), 16f, 0, 0, 1000, 2000);
         robot.setTabs(false);
         pause(1000);
-        moveCoord(130, 122.75f, 0, 100, 2000);
+        moveCoord(135, 122.75f, 0, 1000, 2000);
         robot.setTabs(true);
         pause(1000);
-        moveCoord(130, 108, 0, 100, 1000);
-        moveCoord(104, 108, 0, 100, 1000);
+        moveCoord(135, 100, 0, 1000, 1000);
+        moveCoord(135, 100, 0, 1000, 1000);
         robot.setTabs(false);
-        moveCoord(104, 108, 180, 100, 1000);
-        moveCoord(104, 120, 0, 100, 1000);
-        moveCoord(115, 120, 0, 100, 1000);
-        moveTarget(field.getObject("r bridge"), -5, 0, 0, 100, 2000);
+        moveCoord(95, 100, 180, 1000, 3000);
+        moveCoord(95, 120, 0, 1000, 1000);
+        moveCoord(115, 120, 0, 1000, 1000);
+        moveTarget(field.getObject("r bridge"), -5, 0, 0, 1000, 2000);
     }
 
     /**
@@ -170,12 +189,12 @@ public class RedAutonomous extends LinearOpMode {
     private void move(float left, float right) {
         if (opModeIsActive()) {
             Matrix move = new Matrix(2, 2);
-            move.setValues(new float[] {left, right, left, right});
+            move.setValues(new float[]{left, right, left, right});
             int[] targets = encoderDrive.drive(move);
             while (opModeIsActive() &&
                     (robot.isBusy(Robot.Motor.FRONT_LEFT) || robot.isBusy(Robot.Motor.FRONT_RIGHT) ||
                             robot.isBusy(Robot.Motor.BACK_LEFT) || robot.isBusy(Robot.Motor.BACK_RIGHT))) {
-                encoderDrive.tick(telemetry, targets, new float[] {});
+                encoderDrive.tick(telemetry, targets, new float[]{});
             }
         }
     }
@@ -205,11 +224,11 @@ public class RedAutonomous extends LinearOpMode {
     /**
      * Used to move to a specific coordinate on the field.
      *
-     * @param x X coordinate in inches for where to move the center of the robot to.
-     * @param y Y coordinate in inches for where to move the center of the robot to.
-     * @param rotationDegrees Integer of degrees to rotate the robot for.
+     * @param x                X coordinate in inches for where to move the center of the robot to.
+     * @param y                Y coordinate in inches for where to move the center of the robot to.
+     * @param rotationDegrees  Integer of degrees to rotate the robot for.
      * @param waitMilliseconds Milliseconds to wait after movement before starting next movement.
-     * @param movetimer Milliseconds it should take for this move. If it never reaches the end position, it will stop after this time elapses.
+     * @param movetimer        Milliseconds it should take for this move. If it never reaches the end position, it will stop after this time elapses.
      */
     private void moveCoord(float x, float y, int rotationDegrees, long waitMilliseconds, long movetimer) {
         if (opModeIsActive()) {
@@ -223,19 +242,19 @@ public class RedAutonomous extends LinearOpMode {
                 encoderDrive.tick(telemetry, targets, driveMatrix.telemetryData);
             }
             encoderDrive.stop();
-            sleep(waitMilliseconds);
+            pause(waitMilliseconds);
         }
     }
 
     /**
      * Used to move to a specific object on the field.
      *
-     * @param target Target {@link FieldObject} to move the center of the robot to.
-     * @param xOffset Inches to move the destination point after rotation on the x axis.
-     * @param yOffset Inches to move the destination point after rotation on the y axis.
-     * @param rotationDegrees Integer of degrees to rotate the robot for.
+     * @param target           Target {@link FieldObject} to move the center of the robot to.
+     * @param xOffset          Inches to move the destination point after rotation on the x axis.
+     * @param yOffset          Inches to move the destination point after rotation on the y axis.
+     * @param rotationDegrees  Integer of degrees to rotate the robot for.
      * @param waitMilliseconds Milliseconds to wait after movement before starting next movement.
-     * @param movetimer Milliseconds it should take for this move. If it never reaches the end position, it will stop after this time elapses.
+     * @param movetimer        Milliseconds it should take for this move. If it never reaches the end position, it will stop after this time elapses.
      */
     private void moveTarget(FieldObject target, float xOffset, float yOffset, int rotationDegrees, long waitMilliseconds, long movetimer) {
         if (opModeIsActive()) {
@@ -249,7 +268,7 @@ public class RedAutonomous extends LinearOpMode {
                 encoderDrive.tick(telemetry, targets, driveMatrix.telemetryData);
             }
             encoderDrive.stop();
-            sleep(waitMilliseconds);
+            pause(waitMilliseconds);
         }
     }
 
@@ -285,7 +304,7 @@ public class RedAutonomous extends LinearOpMode {
      * @param workTime Milliseconds to wait before continuing.
      */
     private void pause(long workTime) {
-        time = runtime.milliseconds();
+        double time = runtime.milliseconds();
         while (opModeIsActive()) {
             if (runtime.milliseconds() - time > workTime) {
                 break;

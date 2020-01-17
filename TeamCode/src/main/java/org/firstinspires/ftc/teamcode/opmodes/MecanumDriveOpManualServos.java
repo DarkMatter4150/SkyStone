@@ -2,15 +2,14 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.RobotLog;
 
-import org.firstinspires.ftc.teamcode.breakout.BreakoutMotor;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.breakout.EncoderDrive;
 import org.firstinspires.ftc.teamcode.breakout.Robot;
 import org.firstinspires.ftc.teamcode.mecanum.Mecanum;
-
-import static org.firstinspires.ftc.teamcode.breakout.BreakoutMotor.Direction.MOTOR_F;
-import static org.firstinspires.ftc.teamcode.breakout.BreakoutMotor.Direction.MOTOR_R;
 
 /**
  * This class is used for the main game to drive the robot using the controllers.
@@ -116,6 +115,12 @@ public class MecanumDriveOpManualServos extends OpMode {
             robot.setIntakeServos(false);
         }
 
+        if (checkColor()) {
+            telemetry.addData("SkyStone", true);
+        } else {
+            telemetry.addData("SkyStone", false);
+        }
+
         robot.setWheelIntake(leftTrigger2-rightTrigger2);
 
         //Arm
@@ -132,6 +137,16 @@ public class MecanumDriveOpManualServos extends OpMode {
         telemetry.addData("BR Power Float", robot.getPower(Robot.Motor.BACK_RIGHT));
         telemetry.addData("Claw Pos", robot.getClawPos());
         telemetry.addData("slow?", slow);
+    }
+
+    private boolean checkColor() {
+        ColorSensor colorSensor = robot.getColorSensor();
+        float red = colorSensor.red();
+        float blue = colorSensor.blue();
+        DistanceSensor distanceSensor = robot.getDistanceSensor();
+        float distance = EncoderDrive.toFloat(distanceSensor.getDistance(DistanceUnit.CM));
+
+        return !((red - blue > 30) && (distance < 6.5f) && (red > blue));
     }
 
     @Override

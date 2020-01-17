@@ -1,11 +1,15 @@
 package org.firstinspires.ftc.teamcode.breakout;
 
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+
 import static org.firstinspires.ftc.teamcode.breakout.BreakoutMotor.Direction.MOTOR_F;
 import static org.firstinspires.ftc.teamcode.breakout.BreakoutMotor.Direction.MOTOR_R;
 
@@ -13,6 +17,14 @@ import static org.firstinspires.ftc.teamcode.breakout.BreakoutMotor.Direction.MO
  * Class used for all information needed for the robot.
  */
 public class Robot {
+
+    public ColorSensor getColorSensor() {
+        return colorSensor;
+    }
+
+    public DistanceSensor getDistanceSensor() {
+        return distanceSensor;
+    }
 
     /**
      * Enum for each motor on the robot.
@@ -72,7 +84,9 @@ public class Robot {
     private BreakoutServo tabRight = new BreakoutServo();
     private BreakoutServo claw = new BreakoutServo();
 
-    //Gyro
+    //Sensors
+    private ColorSensor colorSensor;
+    private DistanceSensor distanceSensor;
     private BreakoutREVGyro gyro = new BreakoutREVGyro();
 
     //Misc
@@ -329,6 +343,9 @@ public class Robot {
         gyro.calibrate();
         telemetry.clearAll();
         telemetry.update();
+
+        colorSensor = hardwareMap.colorSensor.get("colorSensor");
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "colorSensor");
 
         // Define and Initialize Motors
         frontLeft.set(hardwareMap.dcMotor.get("frontLeft"));

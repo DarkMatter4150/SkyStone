@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.breakout;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.field.FieldObject;
 import org.firstinspires.ftc.teamcode.field.RobotObject;
@@ -117,7 +118,6 @@ public class EncoderDrive {
 
         // Calculates the distance to rotate.
         // Formula for arc length (degrees): theta/360 * tau * radius
-        float zInches = rotationDegrees * 0.207407f;
 
         // Creates x and y matrices to be used to find how far each wheel should travel.
         Matrix xMatrix = new Matrix(2, 2);
@@ -138,9 +138,11 @@ public class EncoderDrive {
         // Adds in the z matrix if the rotation degrees is not zero, meaning we want the robot to rotate.
         if (rotationDegrees != 0) {
             Matrix zMatrix = new Matrix(2, 2);
+            float deg = rotationDegrees / 90;
+            float dist = deg * 18.35f;
             float[] driveZ = {1, -1, 1, -1};
             zMatrix.setValues(driveZ);
-            zMatrix.scalar(zInches);
+            zMatrix.scalar(dist);
             MatrixHandler xyzHandler = new MatrixHandler(xy, zMatrix);
             fin = xyzHandler.addMatrices();
         }
@@ -296,7 +298,7 @@ public class EncoderDrive {
      * @param a: Double to be transformed.
      * @return Returns a float with the same value as the double.
      */
-    private static float toFloat(double a) {
+    public static float toFloat(double a) {
         return Float.valueOf(String.valueOf(a));
     }
 
