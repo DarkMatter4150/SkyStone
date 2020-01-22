@@ -101,14 +101,14 @@ public class Auto extends LinearOpMode {
      * Method used to park under the bridge
      */
     void parkRed() {
-        moveCoord(134, 72, 0, 0, 1000);
+        moveCoord(134, 72, 0, 0, 30000);
     }
 
     /**
      * Method used to park under the blue bridge
      */
     void parkBlue() {
-        moveCoord(10, 72, 0, 0, 1000);
+        moveCoord(10, 72, 0, 0, 30000);
     }
 
     //TODO: test SkyStone code
@@ -148,24 +148,47 @@ public class Auto extends LinearOpMode {
         dropBlock(1000);
     }
 
+    public void mitchTest() {
+        moveCoord(robotObject.getCenterX() + 24, robotObject.getCenterY(), 0, 1000, 10000);
+        moveCoord(robotObject.getCenterX(), robotObject.getCenterY() + 24, 0, 1000, 10000);
+    }
+
     /**
      * Method used to get the foundation, starting at x=135, y=111
      */
     void getFoundationRed() {
         moveCoord(135, 122.75f, 0, 100, 1000);
-        moveTarget(field.getObject("r foundation"), 16f, 0, 0, 1000, 2000);
+        moveTarget(field.getObject("r foundation"), 14f, 0, 0, 100, 2000);
         robot.setTabs(false);
         pause(1000);
-        moveCoord(135, 122.75f, 0, 1000, 2000);
+        moveCoord(135, 122.75f, 0, 100, 2000);
         robot.setTabs(true);
-        pause(1000);
-        moveCoord(135, 100, 0, 1000, 1000);
-        moveCoord(135, 100, 0, 1000, 1000);
+        pause(6000);
+//        moveCoord(135, 95, 0, 100, 2300);
+//        moveCoord(95, 95, 0, 100, 2300);
+//        robot.setTabs(false);
+//        rotate(180, 2500);
+//        moveCoord(95, 125, 0, 100, 2000);
+//        moveCoord(115, 125, 0, 100, 2000);
+    }
+
+    /**
+     * Moves foundation for the blue side
+     */
+    void getFoundationBlue() {
+        moveCoord(9, 122.75f, 0, 100, 1000);
+        moveTarget(field.getObject("b foundation"), -14f, 0, 0, 100, 2000);
         robot.setTabs(false);
-        moveCoord(95, 100, 180, 1000, 3000);
-        moveCoord(95, 120, 0, 1000, 1000);
-        moveCoord(115, 120, 0, 1000, 1000);
-        moveTarget(field.getObject("r bridge"), -5, 0, 0, 1000, 2000);
+        pause(1000);
+        moveCoord(9, 122.75f, 0, 100, 2000);
+        robot.setTabs(true);
+        pause(6000);
+//        moveCoord(9, 95, 0, 100, 2300);
+//        moveCoord(49, 95, 0, 100, 2300);
+//        robot.setTabs(false);
+//        rotate(180, 2500);
+//        moveCoord(49, 125, 0, 100, 2000);
+//        moveCoord(29, 125, 0, 100, 2000);
     }
 
     /**
@@ -197,6 +220,16 @@ public class Auto extends LinearOpMode {
                 encoderDrive.tick(telemetry, targets, new float[]{});
             }
         }
+    }
+
+    /**
+     * Rotates the robot by the degrees given for the milliseconds given
+     *
+     * @param degrees int for number of degrees to rotate
+     * @param timer   int for number of milliseconds to do the move for
+     */
+    private void rotate(int degrees, int timer) {
+        moveCoord(robotObject.getCenterX(), robotObject.getCenterY(), degrees, 100, timer);
     }
 
     /**

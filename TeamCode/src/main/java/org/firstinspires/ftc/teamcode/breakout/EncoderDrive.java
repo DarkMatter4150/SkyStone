@@ -113,11 +113,9 @@ public class EncoderDrive {
         // Rotates the points to get the movement.
         float xInches = toFloat(xCoordinate*c - yCoordinate*s);
         float yInches = toFloat(xCoordinate*s - yCoordinate*c);
-
-        //TODO: figure out rotating (done i think, just test)
-
-        // Calculates the distance to rotate.
-        // Formula for arc length (degrees): theta/360 * tau * radius
+        // Adjust for real world application
+        xInches *= 1.33;
+        yInches *= 1.04;
 
         // Creates x and y matrices to be used to find how far each wheel should travel.
         Matrix xMatrix = new Matrix(2, 2);

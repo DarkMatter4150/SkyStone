@@ -176,15 +176,16 @@ public class Robot {
      * @param power Power of the motor from -1 to 1.
      */
     public void moveArm(float power) {
-        int currentPosition = arm.getCurrentPosition();
-        int target = currentPosition + (int)(power*52);
-        arm.setTargetPosition(target);
-        arm.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
-        if (target < currentPosition) {
-            arm.setPower(-1);
-        } else {
-            arm.setPower(1);
-        }
+//        int currentPosition = arm.getCurrentPosition();
+//        int target = currentPosition + (int)(power*52);
+//        arm.setTargetPosition(target);
+//        arm.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        if (target < currentPosition) {
+//            arm.setPower(-1);
+//        } else {
+//            arm.setPower(1);
+//        }
+        arm.setPower(power / 3);
     }
 
     /**
