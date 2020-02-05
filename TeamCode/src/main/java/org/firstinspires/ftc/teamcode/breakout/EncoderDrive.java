@@ -305,6 +305,13 @@ public class EncoderDrive {
     }
 
     /**
+     * Turns float into an int.
+     *
+     * @param a: Float to be changed
+     * @return
+     */
+
+    /**
      * Data class to contain both a {@link Matrix} and a float array for telemetry.
      */
     public class Data {
