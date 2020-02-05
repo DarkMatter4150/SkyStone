@@ -154,8 +154,8 @@ public class MecanumDriveOpManualServos extends OpMode {
         }
 
         if (gamepad1.a) {
-            savedPoint.x = EncoderDrive.toInt(robotObject.getCenterX());
-
+            savedPoint.x = (int)(robotObject.getCenterX());
+            savedPoint.y = (int)(robotObject.getCenterY());
         }
 
         robot.setWheelIntake(leftTrigger2-rightTrigger2);
