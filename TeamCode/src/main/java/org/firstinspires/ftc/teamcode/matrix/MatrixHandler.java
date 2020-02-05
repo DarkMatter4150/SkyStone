@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.matrix;
 
 public class MatrixHandler {
 
-    Matrix a;
-    Matrix b;
+    private Matrix a;
+    private Matrix b;
 
     public MatrixHandler(Matrix a, Matrix b) {
         this.a = a;

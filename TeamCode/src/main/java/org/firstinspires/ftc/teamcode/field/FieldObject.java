@@ -16,7 +16,7 @@ public class FieldObject {
      * @param length Length of the field object. (Y distance)
      * @param name Name of the field object used to figure out which one it is.
      */
-    public FieldObject(float x, float y, float width, float length, String name) {
+    FieldObject(float x, float y, float width, float length, String name) {
         this.coordinates = new float[] {x, y};
         this.width = width;
         this.length = length;

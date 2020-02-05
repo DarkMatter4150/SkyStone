@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
  * This class is used to simplify the usage of DC Motors in the code.
- * Please use this class instead of DcMotor.
  */
 public class BreakoutMotor {
 

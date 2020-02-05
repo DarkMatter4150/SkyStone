@@ -54,7 +54,7 @@ public class Field {
      * @param name Name of the object.
      * @param object {@link FieldObject} to add to the HashMap.
      */
-    public void addObject(String name, FieldObject object) {
+    private void addObject(String name, FieldObject object) {
         fieldObjects.put(name, object);
     }
 

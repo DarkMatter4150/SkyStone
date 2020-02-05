@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.matrix;
 
 public class Matrix {
 
-    float[][] matrix;
+    private float[][] matrix;
 
     public Matrix(int x, int y) {
         matrix = new float[y][x];

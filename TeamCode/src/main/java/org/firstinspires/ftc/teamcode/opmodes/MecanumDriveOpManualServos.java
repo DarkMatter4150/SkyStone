@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import android.graphics.Point;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -9,25 +11,46 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.breakout.EncoderDrive;
 import org.firstinspires.ftc.teamcode.breakout.Robot;
+import org.firstinspires.ftc.teamcode.field.RobotObject;
 import org.firstinspires.ftc.teamcode.mecanum.Mecanum;
+
+/*
+ * TODO
+ * Arm stick inverted
+ * Tab button switched
+ * -------------------
+ * Stacking heights (elevator)
+ * Automate grab block
+ *
+ */
+
 
 /**
  * This class is used for the main game to drive the robot using the controllers.
  **/
-@TeleOp(name = "Mecanum Bumper Intake Opening", group = "Pushbot")
+@TeleOp(name = "Robot Drive", group = "Pushbot")
 
 public class MecanumDriveOpManualServos extends OpMode {
 
     //Motor objects
     private Robot robot = new Robot(telemetry);
+    private RobotObject robotObject = new RobotObject(0, 0, 18, 18, 0);
+
+    private Point savedPoint = new Point();
+
     private ElapsedTime timer = new ElapsedTime();
     private Mecanum drive;
     private boolean slow = false;
     private boolean claw = false;
     private boolean tabs = true;
+    private boolean finger = false;
     private double clawTimer = 0;
     private double tabTimer = 0;
     private double slowTimer = 0;
+    private double fingerTimer = 0;
+
+    private double startAngle;
+    private double currentRelativeAngle;
 
     @Override
     public void init() {
@@ -45,10 +68,13 @@ public class MecanumDriveOpManualServos extends OpMode {
     public void start() {
         //Motor start
         drive.setPower(0, 0, 0);
+        startAngle = robot.getAngle();
     }
 
     @Override
     public void loop() {
+
+        currentRelativeAngle = robot.getAngle() - startAngle;
 
         //Y+ : forward, Y- : backwards
         //X+ : right, X- : Left
@@ -119,6 +145,17 @@ public class MecanumDriveOpManualServos extends OpMode {
             telemetry.addData("SkyStone", true);
         } else {
             telemetry.addData("SkyStone", false);
+        }
+
+        if (xButton && timer.milliseconds() - fingerTimer > 250) {
+            finger = !finger;
+            robot.setFinger(finger);
+            fingerTimer = timer.milliseconds();
+        }
+
+        if (gamepad1.a) {
+            savedPoint.x = EncoderDriverobotObject.getCenterX();
+
         }
 
         robot.setWheelIntake(leftTrigger2-rightTrigger2);

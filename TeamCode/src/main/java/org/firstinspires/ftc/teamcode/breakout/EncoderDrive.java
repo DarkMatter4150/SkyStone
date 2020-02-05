@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.breakout;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -20,7 +22,7 @@ public class EncoderDrive {
     private static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
     private static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * Math.PI);
-    private static final float DRIVE_SPEED = 1f;
+    private static final float DRIVE_SPEED = 0.7f;
 
     private static final double TAU = 2 * Math.PI;
     private final static float RADIUS = 25.456f;
@@ -80,6 +82,8 @@ public class EncoderDrive {
      * @return Returns {@link Data} object with telemetry and the drive matrix.
      */
     private Data matrix(float x, float y, float xOffset, float yOffset, float rotationDegrees) {
+        Log.i("ROBOT", "Start Coord (in drive): " + String.valueOf(robotObject.getCenterX()));
+        Log.i("ROBOT", String.format("x=%f, y=%f, xoff=%f, yoff=%f, rotate=%f", x, y, xOffset, yOffset, rotationDegrees));
         // Sets robot to run with encoders.
         robot.setRunMode(Robot.Motor.FRONT_LEFT, DcMotor.RunMode.RUN_USING_ENCODER);
         robot.setRunMode(Robot.Motor.FRONT_RIGHT, DcMotor.RunMode.RUN_USING_ENCODER);

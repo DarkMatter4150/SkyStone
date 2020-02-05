@@ -68,6 +68,17 @@ public class Robot {
         IntakePos(double pos) { this.pos = pos; }
     }
 
+    /**
+     * Enum for the finger positions, open and closed
+     */
+    public enum FingerPos {
+        OPEN(0.5d), CLOSED(0d);
+
+        private double pos;
+
+        FingerPos(double pos) { this.pos = pos; }
+    }
+
     //Motors
     private BreakoutMotor frontLeft = new BreakoutMotor();
     private BreakoutMotor frontRight = new BreakoutMotor();
@@ -83,6 +94,7 @@ public class Robot {
     private BreakoutServo tabLeft = new BreakoutServo();
     private BreakoutServo tabRight = new BreakoutServo();
     private BreakoutServo claw = new BreakoutServo();
+    private BreakoutServo finger = new BreakoutServo();
 
     //Sensors
     private ColorSensor colorSensor;
@@ -120,6 +132,19 @@ public class Robot {
         } else {
             tabLeft.setPosition(TabPos.LEFT_CLOSED.pos);
             tabRight.setPosition(TabPos.RIGHT_CLOSED.pos);
+        }
+    }
+
+    /**
+     * Sets the finger position based on input.
+     *
+     * @param open Boolean variable to open/close the tabs.
+     */
+    public void setFinger(boolean open) {
+        if (open) {
+            finger.setPosition(FingerPos.OPEN.pos);
+        } else {
+            finger.setPosition(FingerPos.CLOSED.pos);
         }
     }
 
@@ -185,7 +210,7 @@ public class Robot {
 //        } else {
 //            arm.setPower(1);
 //        }
-        arm.setPower(power / 3);
+        arm.setPower(power / 2);
     }
 
     /**
@@ -363,8 +388,10 @@ public class Robot {
         intakeServoLeft.set(hardwareMap.servo.get("intakeLeft"));
         intakeServoRight.set(hardwareMap.servo.get("intakeRight"));
 
+        finger.set(hardwareMap.servo.get("finger"));
         arm.set(hardwareMap.dcMotor.get("arm"));
         claw.set(hardwareMap.servo.get("claw"));
+
 
         //Set directions for motors
         //F = Clockwise while looking at axle
@@ -397,7 +424,8 @@ public class Robot {
         intakeServoRight.setPosition(IntakePos.RIGHT_CLOSED.pos);
 
         arm.setPower(0);
-        claw.setPosition(ClawPos.OPEN.pos);
+        claw.setPosition(ClawPos.CLOSED.pos);
+        finger.setPosition(FingerPos.CLOSED.pos);
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.

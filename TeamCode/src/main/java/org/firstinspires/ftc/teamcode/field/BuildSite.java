@@ -7,7 +7,7 @@ public class BuildSite extends FieldObject {
     private float length;
     private boolean redSite;
 
-    public BuildSite(float x, float y, float width, float length, String name, boolean redSite) {
+    BuildSite(float x, float y, float width, float length, String name, boolean redSite) {
         super(x, y, width, length, name);
         this.coordinates = new float[] {x, y};
         this.width = width;

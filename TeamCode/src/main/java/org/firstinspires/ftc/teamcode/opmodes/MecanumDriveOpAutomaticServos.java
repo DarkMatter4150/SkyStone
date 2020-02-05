@@ -15,7 +15,7 @@ import static org.firstinspires.ftc.teamcode.breakout.BreakoutMotor.Direction.MO
 /**
  * This class is used for the main game to drive the robot using the controllers.
  **/
-@TeleOp(name = "Mecanum Automatic Intake Opening", group = "Pushbot")
+//@TeleOp(name = "Mecanum Automatic Intake Opening", group = "Pushbot")
 
 public class MecanumDriveOpAutomaticServos extends OpMode {
 
@@ -26,9 +26,11 @@ public class MecanumDriveOpAutomaticServos extends OpMode {
     private boolean slow = false;
     private boolean claw = false;
     private boolean tabs = true;
+    private boolean finger = false;
     private double clawTimer = 0;
     private double tabTimer = 0;
     private double slowTimer = 0;
+    private double fingerTimer = 0;
 
     @Override
     public void init() {
@@ -109,6 +111,12 @@ public class MecanumDriveOpAutomaticServos extends OpMode {
         if (gamepad1.a && timer.milliseconds() - slowTimer > 250) {
             slow = !slow;
             slowTimer = timer.milliseconds();
+        }
+
+        if (xButton && timer.milliseconds() - fingerTimer > 250) {
+            finger = !finger;
+            robot.setFinger(finger);
+            fingerTimer = timer.milliseconds();
         }
 
         robot.setWheelIntake(leftTrigger2-rightTrigger2);
