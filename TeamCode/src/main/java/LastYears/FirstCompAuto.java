@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.breakout.Robot;
 import org.firstinspires.ftc.teamcode.mecanum.Mecanum;
 
-@Autonomous(name="first comp auto", group="basic")
+//@Autonomous(name="first comp auto", group="basic")
 public class FirstCompAuto extends LinearOpMode {
 
     private Robot robot = new Robot(telemetry);

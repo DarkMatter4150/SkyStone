@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import android.os.Environment;
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,6 +16,17 @@ import org.firstinspires.ftc.teamcode.field.Field;
 import org.firstinspires.ftc.teamcode.field.FieldObject;
 import org.firstinspires.ftc.teamcode.field.RobotObject;
 import org.firstinspires.ftc.teamcode.matrix.Matrix;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
+
+/*
+ * TODO
+ * Foundation: turn it into the build zone, don't just pull it.
+ */
 
 public class Auto extends LinearOpMode {
 
@@ -30,8 +44,8 @@ public class Auto extends LinearOpMode {
     @Override
     public void runOpMode() {
         // Creates robotObject and encoderDrive to be used later. Set the starting position of the robot here.
-        RobotObject robotObject = new RobotObject(135, 111, 18, 18, 0);
-        encoderDrive = new EncoderDrive(robot, robotObject);
+//        RobotObject robotObject = new RobotObject(135, 111, 18, 18, 0);
+//        encoderDrive = new EncoderDrive(robot, robotObject);
 
         /*
          * Initialize the drive system variables.
@@ -91,24 +105,118 @@ public class Auto extends LinearOpMode {
     }
 
     /**
+     * Experimental function to read instructions from a given filename
+     */
+    void readInstructionFile(String filename) {
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/" + filename);
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        ArrayList<String> data = new ArrayList<>();
+        if (scanner != null) {
+            while (scanner.hasNext()) {
+                data.add(scanner.nextLine());
+            }
+        }
+
+        for (String s : data) {
+            float x;
+            float y;
+            int theta;
+            int time;
+            double speed;
+
+            float xOffset;
+            float yOffset;
+            String target;
+
+            String[] t0 = s.split(":");
+            switch (t0[0]) {
+                case "tabs":
+                    if (t0[1].equals("0")) {
+                        Log.i("ROBOT", "Close tabs");
+                        robot.setTabs(false);
+                        sleep(1000);
+                    } else {
+                        Log.i("ROBOT", "Open tabs");
+                        robot.setTabs(true);
+                        sleep(1000);
+                    }
+                    break;
+                case "s": {
+                    String[] t1 = t0[1].split(",");
+                    x = Float.parseFloat(t1[0]);
+                    y = Float.parseFloat(t1[1]);
+                    theta = Integer.parseInt(t1[2]);
+
+                    Log.i("ROBOT", String.format("Start: x=%f, y=%f, t=%d", x, y, theta));
+
+                    RobotObject obj = new RobotObject(x, y, 18, 18, theta);
+                    resetRobotObject(obj);
+                    break;
+                }
+                case "c": {
+                    String[] t1 = t0[1].split(",");
+                    x = Float.parseFloat(t1[0]);
+                    y = Float.parseFloat(t1[1]);
+                    theta = Integer.parseInt(t1[2]);
+                    theta -= robotObject.getRotation();
+                    time = Integer.parseInt(t1[3]);
+                    speed = Double.parseDouble(t1[4]);
+
+                    Log.i("ROBOT", "Start Pos: " + robotObject.getCenterX() + " " + robotObject.getCenterY());
+
+                    Log.i("ROBOT", String.format("Coord: x=%f, y=%f, t=%d, m=%d", x, y, theta, time));
+
+                    moveCoord(x, y, theta, 100, time, speed);
+                    break;
+                }
+                case "t": {
+                    Log.i("ROBOT", t0[1]);
+                    String[] t1 = t0[1].split(",");
+                    target = t1[0];
+                    xOffset = Float.parseFloat(t1[1]);
+                    yOffset = Float.parseFloat(t1[2]);
+                    theta = Integer.parseInt(t1[3]);
+                    theta -= robotObject.getRotation();
+                    time = Integer.parseInt(t1[4]);
+                    speed = Double.parseDouble(t1[5]);
+
+                    Log.i("ROBOT", "Start Pos: " + robotObject.getCenterX() + " " + robotObject.getCenterY());
+
+                    Log.i("ROBOT", String.format("Start: target=%s x=%f, y=%f, t=%d, m=%d", target, xOffset, yOffset, theta, time));
+
+                    moveTarget(field.getObject(target), xOffset, yOffset, theta, 100, time, speed);
+                    break;
+                }
+            }
+            Log.i("ROBOT", "End Pos: " + robotObject.getCenterX() + " " + robotObject.getCenterY());
+        }
+    }
+
+    /**
      * rotating tests
      */
     void rotate() {
-        moveCoord(robotObject.getCenterX(), robotObject.getCenterY(), 180, 1000, 10000);
+        moveCoord(robotObject.getCenterX(), robotObject.getCenterY(), 180, 1000, 10000, null);
     }
 
     /**
      * Method used to park under the bridge
      */
     void parkRed() {
-        moveCoord(134, 72, 0, 0, 30000);
+        moveCoord(robotObject.getCenterX(), 72, 0, 0, 30000, null);
     }
 
     /**
      * Method used to park under the blue bridge
      */
     void parkBlue() {
-        moveCoord(10, 72, 0, 0, 30000);
+        moveCoord(10, 72, 0, 0, 30000, null);
     }
 
     //TODO: test SkyStone code
@@ -117,19 +225,19 @@ public class Auto extends LinearOpMode {
      * Method used to get the SkyStone
      */
     void skyStonesRed() {
-        moveCoord(135, 35);
-        moveCoord(107, 35);
-        moveCoord(107, 25);
-        for (int i = 0; i < 2; i++) {
-            moveCoord(107, 25 - (i * 8));
-            if (checkColor()) {
-                skyStonePosition = i + 1;
-                break;
+        moveCoord(106, 57);
+        for (int i = 0; i <= 2; i++) {
+            moveCoord(106, 49 - (i * 8), 0, 100, 2000, null);
+            if (i < 2) {
+                if (checkColor()) {
+                    skyStonePosition = i + 1;
+                    break;
+                }
+            } else {
+                skyStonePosition = 3;
             }
         }
-        if (skyStonePosition == -1) {
-            skyStonePosition = 3;
-        }
+        moveCoord(robotObject.getCenterX(), robotObject.getCenterY() - 5);
         grabBlock(1000);
         moveCoord(116, robotObject.getCenterY());
         moveCoord(116, 90);
@@ -140,55 +248,44 @@ public class Auto extends LinearOpMode {
      * Method used to get the second SkyStone
      */
     void skyStones2Red() {
-        moveCoord(135, 35);
-        moveCoord(107, (skyStonePosition * 8) + 24);
-        grabBlock(1000);
-        moveCoord(116, robotObject.getCenterY());
-        moveCoord(116, 90);
-        dropBlock(1000);
-    }
-
-    public void mitchTest() {
-        moveCoord(robotObject.getCenterX() + 24, robotObject.getCenterY(), 0, 1000, 10000);
-        moveCoord(robotObject.getCenterX(), robotObject.getCenterY() + 24, 0, 1000, 10000);
+        if (skyStonePosition != 3) {
+            moveCoord(116, 28 - (skyStonePosition * 8));
+            moveCoord(106, robotObject.getCenterY());
+            grabBlock(1000);
+            moveCoord(116, robotObject.getCenterY());
+            moveCoord(116, 90);
+            dropBlock(1000);
+        }
     }
 
     /**
      * Method used to get the foundation, starting at x=135, y=111
      */
     void getFoundationRed() {
-        moveCoord(135, 122.75f, 0, 100, 1000);
-        moveTarget(field.getObject("r foundation"), 14f, 0, 0, 100, 2000);
+        moveCoord(133, robotObject.getCenterY(), 0, 100, 1000, null);
+        moveCoord(133, 122.75f, 0, 100, 1000, null);
+        moveTarget(field.getObject("r foundation"), 14f, 0, 0, 100, 2000, null);
         robot.setTabs(false);
         pause(1000);
-        moveCoord(135, 122.75f, 0, 100, 2000);
+        moveCoord(135, 122.75f, 0, 100, 2000, null);
         robot.setTabs(true);
-        pause(6000);
-//        moveCoord(135, 95, 0, 100, 2300);
-//        moveCoord(95, 95, 0, 100, 2300);
-//        robot.setTabs(false);
-//        rotate(180, 2500);
-//        moveCoord(95, 125, 0, 100, 2000);
-//        moveCoord(115, 125, 0, 100, 2000);
+        pause(3000);
+        moveCoord(135, 95, 0, 100, 2300, null);
     }
 
     /**
      * Moves foundation for the blue side
      */
     void getFoundationBlue() {
-        moveCoord(9, 122.75f, 0, 100, 1000);
-        moveTarget(field.getObject("b foundation"), -14f, 0, 0, 100, 2000);
+        moveCoord(11, robotObject.getCenterY(), 0, 100, 1000, null);
+        moveCoord(11, 122.75f, 0, 100, 1000, null);
+        moveTarget(field.getObject("b foundation"), -14f, 0, 0, 100, 2000, null);
         robot.setTabs(false);
         pause(1000);
-        moveCoord(9, 122.75f, 0, 100, 2000);
+        moveCoord(9, 122.75f, 0, 100, 2000, null);
         robot.setTabs(true);
-        pause(6000);
-//        moveCoord(9, 95, 0, 100, 2300);
-//        moveCoord(49, 95, 0, 100, 2300);
-//        robot.setTabs(false);
-//        rotate(180, 2500);
-//        moveCoord(49, 125, 0, 100, 2000);
-//        moveCoord(29, 125, 0, 100, 2000);
+        pause(3000);
+        moveCoord(9, 95, 0, 100, 2300, null);
     }
 
     /**
@@ -213,7 +310,7 @@ public class Auto extends LinearOpMode {
         if (opModeIsActive()) {
             Matrix move = new Matrix(2, 2);
             move.setValues(new float[]{left, right, left, right});
-            int[] targets = encoderDrive.drive(move);
+            int[] targets = encoderDrive.drive(move, null);
             while (opModeIsActive() &&
                     (robot.isBusy(Robot.Motor.FRONT_LEFT) || robot.isBusy(Robot.Motor.FRONT_RIGHT) ||
                             robot.isBusy(Robot.Motor.BACK_LEFT) || robot.isBusy(Robot.Motor.BACK_RIGHT))) {
@@ -229,7 +326,7 @@ public class Auto extends LinearOpMode {
      * @param timer   int for number of milliseconds to do the move for
      */
     private void rotate(int degrees, int timer) {
-        moveCoord(robotObject.getCenterX(), robotObject.getCenterY(), degrees, 100, timer);
+        moveCoord(robotObject.getCenterX(), robotObject.getCenterY(), degrees, 100, timer, null);
     }
 
     /**
@@ -241,7 +338,7 @@ public class Auto extends LinearOpMode {
     private void moveCoord(float x, float y) {
         if (opModeIsActive()) {
             EncoderDrive.Data driveMatrix = encoderDrive.getDriveMatrix(x, y, 0);
-            int[] targets = encoderDrive.drive(driveMatrix.fin);
+            int[] targets = encoderDrive.drive(driveMatrix.fin, null);
             ElapsedTime timer = new ElapsedTime();
             double time = timer.milliseconds();
             while (opModeIsActive() && (timer.milliseconds() - time < 1000) &&
@@ -263,10 +360,10 @@ public class Auto extends LinearOpMode {
      * @param waitMilliseconds Milliseconds to wait after movement before starting next movement.
      * @param movetimer        Milliseconds it should take for this move. If it never reaches the end position, it will stop after this time elapses.
      */
-    private void moveCoord(float x, float y, int rotationDegrees, long waitMilliseconds, long movetimer) {
+    private void moveCoord(float x, float y, int rotationDegrees, long waitMilliseconds, long movetimer, Double speed) {
         if (opModeIsActive()) {
             EncoderDrive.Data driveMatrix = encoderDrive.getDriveMatrix(x, y, rotationDegrees);
-            int[] targets = encoderDrive.drive(driveMatrix.fin);
+            int[] targets = encoderDrive.drive(driveMatrix.fin, speed);
             ElapsedTime timer = new ElapsedTime();
             double time = timer.milliseconds();
             while (opModeIsActive() && (timer.milliseconds() - time < movetimer) &&
@@ -289,10 +386,10 @@ public class Auto extends LinearOpMode {
      * @param waitMilliseconds Milliseconds to wait after movement before starting next movement.
      * @param movetimer        Milliseconds it should take for this move. If it never reaches the end position, it will stop after this time elapses.
      */
-    private void moveTarget(FieldObject target, float xOffset, float yOffset, int rotationDegrees, long waitMilliseconds, long movetimer) {
+    private void moveTarget(FieldObject target, float xOffset, float yOffset, int rotationDegrees, long waitMilliseconds, long movetimer, Double speed) {
         if (opModeIsActive()) {
             EncoderDrive.Data driveMatrix = encoderDrive.getDriveMatrix(target, xOffset, yOffset, rotationDegrees);
-            int[] targets = encoderDrive.drive(driveMatrix.fin);
+            int[] targets = encoderDrive.drive(driveMatrix.fin, speed);
             ElapsedTime timer = new ElapsedTime();
             double time = timer.milliseconds();
             while (opModeIsActive() && (timer.milliseconds() - time < movetimer) &&

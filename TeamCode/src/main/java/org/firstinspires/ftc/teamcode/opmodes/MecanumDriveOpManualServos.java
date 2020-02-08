@@ -21,7 +21,6 @@ import org.firstinspires.ftc.teamcode.mecanum.Mecanum;
  * -------------------
  * Stacking heights (elevator)
  * Automate grab block
- *
  */
 
 
@@ -161,7 +160,7 @@ public class MecanumDriveOpManualServos extends OpMode {
         robot.setWheelIntake(leftTrigger2-rightTrigger2);
 
         //Arm
-        robot.moveArm(leftStick2y);
+        robot.moveArm(-leftStick2y);
 
         //Telemetry
         telemetry.addData("FL", output[0]);

@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.breakout.BreakoutMotor;
 
-@TeleOp(name = "Motor Test", group = "Test")
+//@TeleOp(name = "Motor Test", group = "Test")
 public class MotorTest extends OpMode {
     private BreakoutMotor frontLeft = new BreakoutMotor();
 

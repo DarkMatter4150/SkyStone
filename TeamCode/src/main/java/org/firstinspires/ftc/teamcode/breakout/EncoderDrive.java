@@ -167,7 +167,7 @@ public class EncoderDrive {
      * @param fin {@link Matrix} used to tell how far each wheel should travel. 2x2 only.
      * @return Array of ints containing the four targets for each wheel.
      */
-    public int[] drive(Matrix fin) {
+    public int[] drive(Matrix fin, Double spee) {
         // Determine new target position, and pass to motor controller
         int frontLeftTarget = robot.getCurrentPosition(Robot.Motor.FRONT_LEFT) + (int) (fin.getValue(0, 0) * COUNTS_PER_INCH);
         int frontRightTarget = robot.getCurrentPosition(Robot.Motor.FRONT_RIGHT) + (int) (fin.getValue(1, 0) * COUNTS_PER_INCH);
@@ -186,10 +186,18 @@ public class EncoderDrive {
 
         // Reset the timeout time and start motion.
         runtime.reset();
-        robot.setPower(Robot.Motor.FRONT_LEFT, DRIVE_SPEED);
-        robot.setPower(Robot.Motor.FRONT_RIGHT, DRIVE_SPEED);
-        robot.setPower(Robot.Motor.BACK_LEFT, DRIVE_SPEED);
-        robot.setPower(Robot.Motor.BACK_RIGHT, DRIVE_SPEED);
+        if (spee == null) {
+            robot.setPower(Robot.Motor.FRONT_LEFT, DRIVE_SPEED);
+            robot.setPower(Robot.Motor.FRONT_RIGHT, DRIVE_SPEED);
+            robot.setPower(Robot.Motor.BACK_LEFT, DRIVE_SPEED);
+            robot.setPower(Robot.Motor.BACK_RIGHT, DRIVE_SPEED);
+        } else {
+            float speed = Float.valueOf(String.valueOf(spee));
+            robot.setPower(Robot.Motor.FRONT_LEFT, speed);
+            robot.setPower(Robot.Motor.FRONT_RIGHT, speed);
+            robot.setPower(Robot.Motor.BACK_LEFT, speed);
+            robot.setPower(Robot.Motor.BACK_RIGHT, speed);
+        }
 
         // Return target array for tick method.
         return new int[] {frontLeftTarget, frontRightTarget, backLeftTarget, backRightTarget};

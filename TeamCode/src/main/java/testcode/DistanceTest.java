@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-@Autonomous(name = "DistanceTest", group = "Pushbot")
+//@Autonomous(name = "DistanceTest", group = "Pushbot")
 
 public class DistanceTest extends OpMode {
 
