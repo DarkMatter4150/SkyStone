@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import android.graphics.Point;
 
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -176,7 +177,7 @@ public class MecanumDriveOpManualServos extends OpMode {
     }
 
     private boolean checkColor() {
-        ColorSensor colorSensor = robot.getColorSensor();
+        RevColorSensorV3 colorSensor = robot.getColorSensor();
         float red = colorSensor.red();
         float blue = colorSensor.blue();
         DistanceSensor distanceSensor = robot.getDistanceSensor();

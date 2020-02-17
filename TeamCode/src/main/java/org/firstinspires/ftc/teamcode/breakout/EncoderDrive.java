@@ -82,8 +82,8 @@ public class EncoderDrive {
      * @return Returns {@link Data} object with telemetry and the drive matrix.
      */
     private Data matrix(float x, float y, float xOffset, float yOffset, float rotationDegrees) {
-        Log.i("ROBOT", "Start Coord (in drive): " + String.valueOf(robotObject.getCenterX()));
-        Log.i("ROBOT", String.format("x=%f, y=%f, xoff=%f, yoff=%f, rotate=%f", x, y, xOffset, yOffset, rotationDegrees));
+//        Log.i("ROBOT", "Start Coord (in drive): " + robotObject.getCenterX());
+//        Log.i("ROBOT", String.format("x=%f, y=%f, xoff=%f, yoff=%f, rotate=%f", x, y, xOffset, yOffset, rotationDegrees));
         // Sets robot to run with encoders.
         robot.setRunMode(Robot.Motor.FRONT_LEFT, DcMotor.RunMode.RUN_USING_ENCODER);
         robot.setRunMode(Robot.Motor.FRONT_RIGHT, DcMotor.RunMode.RUN_USING_ENCODER);
@@ -267,6 +267,7 @@ public class EncoderDrive {
 
         // Starts wheel intake.
         robot.setWheelIntake(1);
+        robot.setIntakeServos(true);
     }
 
     /**
@@ -290,6 +291,7 @@ public class EncoderDrive {
      */
     public void revert(String par0) {
         if (par0.equals("grab")) {
+            robot.setIntakeServos(false);
             robot.setPower(Robot.Motor.FRONT_LEFT, -1);
             robot.setPower(Robot.Motor.FRONT_RIGHT, -1);
             robot.setPower(Robot.Motor.BACK_LEFT, -1);

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.breakout;
 
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -18,7 +19,7 @@ import static org.firstinspires.ftc.teamcode.breakout.BreakoutMotor.Direction.MO
  */
 public class Robot {
 
-    public ColorSensor getColorSensor() {
+    public RevColorSensorV3 getColorSensor() {
         return colorSensor;
     }
 
@@ -97,7 +98,7 @@ public class Robot {
     private BreakoutServo finger = new BreakoutServo();
 
     //Sensors
-    private ColorSensor colorSensor;
+    private RevColorSensorV3 colorSensor;
     private DistanceSensor distanceSensor;
     private BreakoutREVGyro gyro = new BreakoutREVGyro();
 
@@ -370,7 +371,7 @@ public class Robot {
         telemetry.clearAll();
         telemetry.update();
 
-        colorSensor = hardwareMap.colorSensor.get("colorSensor");
+        colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
         distanceSensor = hardwareMap.get(DistanceSensor.class, "colorSensor");
 
         // Define and Initialize Motors

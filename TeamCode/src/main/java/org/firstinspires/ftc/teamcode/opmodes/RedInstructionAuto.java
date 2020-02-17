@@ -9,7 +9,7 @@ public class RedInstructionAuto extends Auto {
     void instructions() {
         readInstructionFile("skystonered.field");
         skyStonesRed();
-        skyStones2Red();
-        parkRed();
+//        skyStones2Red();
+//        parkRed();
     }
 }
