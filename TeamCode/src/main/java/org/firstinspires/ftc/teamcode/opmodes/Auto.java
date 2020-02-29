@@ -256,13 +256,18 @@ public class Auto extends LinearOpMode {
             }
             double angle = robot.getAngle();
             moveCoord(robotObject.getCenterX(), robotObject.getCenterY(), (int)Math.round(angle), 100, 1000, 0.7d);
+            robotObject.setRotation(robotObject.getRotation() - (int)Math.round(angle));
         }
         moveCoord(robotObject.getCenterX(), robotObject.getCenterY() - 8);
         Log.i("SKYSTONES", robotObject.getCenterX() + "," + robotObject.getCenterY());
-        grabBlock(1000);
-//        moveCoord(116, robotObject.getCenterY());
-//        moveCoord(116, 90);
-//        dropBlock(1000);
+        grabBlock(1000, 1000);
+//        moveCoord(106, robotObject.getCenterY());
+        Log.i("HELP", robotObject.getCenterX() + "," + robotObject.getCenterY() + "," + robotObject.getRotation());
+        moveCoord(106, 90, 0, 100, 7000, 0.7d);
+        Log.i("HELP", robotObject.getCenterX() + "," + robotObject.getCenterY() + "," + robotObject.getRotation());
+        dropBlock(200, 1000);
+        parkRed();
+//        skyStones2Red();
     }
 
     /**
@@ -272,10 +277,10 @@ public class Auto extends LinearOpMode {
         if (skyStonePosition != 3) {
             moveCoord(116, 28 - (skyStonePosition * 8));
             moveCoord(106, robotObject.getCenterY());
-            grabBlock(1000);
+            grabBlock(1000, 1000);
             moveCoord(116, robotObject.getCenterY());
             moveCoord(116, 90);
-            dropBlock(1000);
+            dropBlock(1000, 1000);
         }
     }
 
@@ -322,7 +327,7 @@ public class Auto extends LinearOpMode {
         float distance = EncoderDrive.toFloat(distanceSensor.getDistance(DistanceUnit.CM));
         boolean found = red - blue <= 30 && distance < 6.5f;
 
-        Log.i("COLOR", String.format("red %f, blue %f, green %d, distance %f, found %b", red, blue, -1, distance, found));
+//        Log.i("COLOR", String.format("red %f, blue %f, green %d, distance %f, found %b", red, blue, -1, distance, found));
 
         return found;
     }
@@ -340,7 +345,7 @@ public class Auto extends LinearOpMode {
         float distance = EncoderDrive.toFloat(distanceSensor.getDistance(DistanceUnit.CM));
         boolean found = red - blue <= 30 && distance < 6.5f;
 
-        Log.i("COLOR", String.format("red %f, blue %f, green %d, distance %f, found %b", red, blue, -1, distance, found));
+//        Log.i("COLOR", String.format("red %f, blue %f, green %d, distance %f, found %b", red, blue, -1, distance, found));
 
         return found;
     }
@@ -400,15 +405,15 @@ public class Auto extends LinearOpMode {
      * @param y                Y coordinate in inches for where to move the center of the robot to.
      * @param rotationDegrees  Integer of degrees to rotate the robot for.
      * @param waitMilliseconds Milliseconds to wait after movement before starting next movement.
-     * @param movetimer        Milliseconds it should take for this move. If it never reaches the end position, it will stop after this time elapses.
+     * @param moveTimer        Milliseconds it should take for this move. If it never reaches the end position, it will stop after this time elapses.
      */
-    private void moveCoord(float x, float y, int rotationDegrees, long waitMilliseconds, long movetimer, Double speed) {
+    private void moveCoord(float x, float y, int rotationDegrees, long waitMilliseconds, long moveTimer, Double speed) {
         if (opModeIsActive()) {
             EncoderDrive.Data driveMatrix = encoderDrive.getDriveMatrix(x, y, rotationDegrees);
             int[] targets = encoderDrive.drive(driveMatrix.fin, speed);
             ElapsedTime timer = new ElapsedTime();
             double time = timer.milliseconds();
-            while (opModeIsActive() && (timer.milliseconds() - time < movetimer) &&
+            while (opModeIsActive() && (timer.milliseconds() - time < moveTimer) &&
                     (robot.isBusy(Robot.Motor.FRONT_LEFT) || robot.isBusy(Robot.Motor.FRONT_RIGHT) ||
                             robot.isBusy(Robot.Motor.BACK_LEFT) || robot.isBusy(Robot.Motor.BACK_RIGHT))) {
                 encoderDrive.tick(telemetry, targets, driveMatrix.telemetryData);
@@ -449,9 +454,11 @@ public class Auto extends LinearOpMode {
      *
      * @param workTime Milliseconds for how long to drive forward and intake.
      */
-    private void grabBlock(long workTime) {
+    private void grabBlock(long workTime, long waitTime) {
         encoderDrive.pickUpBlock();
         pause(workTime);
+        encoderDrive.stop2();
+        pause(waitTime);
         encoderDrive.revert("grab");
         pause(workTime);
         encoderDrive.stop();
@@ -462,9 +469,11 @@ public class Auto extends LinearOpMode {
      *
      * @param workTime Milliseconds for how long to drive backwards and outtake.
      */
-    private void dropBlock(long workTime) {
+    private void dropBlock(long workTime, long waitTime) {
         encoderDrive.dropBlock();
         pause(workTime);
+        encoderDrive.stop();
+        pause(waitTime);
         encoderDrive.revert("drop");
         pause(workTime);
         encoderDrive.stop();

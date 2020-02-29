@@ -248,6 +248,25 @@ public class EncoderDrive {
         robot.setPower(Robot.Motor.BACK_LEFT, 0);
         robot.setPower(Robot.Motor.BACK_RIGHT, 0);
 
+        robot.setWheelIntake(0);
+
+        // Turn off RUN_TO_POSITION
+        robot.setRunMode(Robot.Motor.FRONT_LEFT, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.setRunMode(Robot.Motor.FRONT_RIGHT, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.setRunMode(Robot.Motor.BACK_LEFT, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.setRunMode(Robot.Motor.BACK_RIGHT, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    /**
+     * Stop method stops all power to the motors and turns off encoders.
+     */
+    public void stop2() {
+        // Stop all motion;
+        robot.setPower(Robot.Motor.FRONT_LEFT, 0);
+        robot.setPower(Robot.Motor.FRONT_RIGHT, 0);
+        robot.setPower(Robot.Motor.BACK_LEFT, 0);
+        robot.setPower(Robot.Motor.BACK_RIGHT, 0);
+
         // Turn off RUN_TO_POSITION
         robot.setRunMode(Robot.Motor.FRONT_LEFT, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.setRunMode(Robot.Motor.FRONT_RIGHT, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -260,10 +279,10 @@ public class EncoderDrive {
      */
     public void pickUpBlock() {
         // Starts driving forward.
-        robot.setPower(Robot.Motor.FRONT_LEFT, 1);
-        robot.setPower(Robot.Motor.FRONT_RIGHT, 1);
-        robot.setPower(Robot.Motor.BACK_LEFT, 1);
-        robot.setPower(Robot.Motor.BACK_RIGHT, 1);
+        robot.setPower(Robot.Motor.FRONT_LEFT, 0.7f);
+        robot.setPower(Robot.Motor.FRONT_RIGHT, 0.7f);
+        robot.setPower(Robot.Motor.BACK_LEFT, 0.7f);
+        robot.setPower(Robot.Motor.BACK_RIGHT, 0.7f);
 
         // Starts wheel intake.
         robot.setWheelIntake(1);
@@ -275,10 +294,10 @@ public class EncoderDrive {
      */
     public void dropBlock() {
         // Starts driving backwards.
-        robot.setPower(Robot.Motor.FRONT_LEFT, -1);
-        robot.setPower(Robot.Motor.FRONT_RIGHT, -1);
-        robot.setPower(Robot.Motor.BACK_LEFT, -1);
-        robot.setPower(Robot.Motor.BACK_RIGHT, -1);
+        robot.setPower(Robot.Motor.FRONT_LEFT, -0.7f);
+        robot.setPower(Robot.Motor.FRONT_RIGHT, -0.7f);
+        robot.setPower(Robot.Motor.BACK_LEFT, -0.7f);
+        robot.setPower(Robot.Motor.BACK_RIGHT, -0.7f);
 
         // Starts intake in reverse.
         robot.setWheelIntake(-1);
@@ -292,15 +311,18 @@ public class EncoderDrive {
     public void revert(String par0) {
         if (par0.equals("grab")) {
             robot.setIntakeServos(false);
-            robot.setPower(Robot.Motor.FRONT_LEFT, -1);
-            robot.setPower(Robot.Motor.FRONT_RIGHT, -1);
-            robot.setPower(Robot.Motor.BACK_LEFT, -1);
-            robot.setPower(Robot.Motor.BACK_RIGHT, -1);
+            robot.setPower(Robot.Motor.FRONT_LEFT, -0.7f);
+            robot.setPower(Robot.Motor.FRONT_RIGHT, -0.7f);
+            robot.setPower(Robot.Motor.BACK_LEFT, -0.7f);
+            robot.setPower(Robot.Motor.BACK_RIGHT, -0.7f);
+            robot.setIntakeServos(false);
         } else if (par0.equals("drop")) {
-            robot.setPower(Robot.Motor.FRONT_LEFT, 1);
-            robot.setPower(Robot.Motor.FRONT_RIGHT, 1);
-            robot.setPower(Robot.Motor.BACK_LEFT, 1);
-            robot.setPower(Robot.Motor.BACK_RIGHT, 1);
+            robot.setPower(Robot.Motor.FRONT_LEFT, 0.7f);
+            robot.setPower(Robot.Motor.FRONT_RIGHT, 0.7f);
+            robot.setPower(Robot.Motor.BACK_LEFT, 0.7f);
+            robot.setPower(Robot.Motor.BACK_RIGHT, 0.7f);
+            robot.setWheelIntake(0);
+            robot.setIntakeServos(false);
         }
     }
 

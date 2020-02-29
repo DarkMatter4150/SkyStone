@@ -56,8 +56,8 @@ public class Robot {
      * Enum for the pull tabs' positions, open and closed for each side.
      */
     public enum TabPos {
-        LEFT_OPEN(0.3d), LEFT_CLOSED(0d),
-        RIGHT_OPEN(0.85d), RIGHT_CLOSED(1d);
+        LEFT_OPEN(0.3d), LEFT_CLOSED(0.1d),
+        RIGHT_OPEN(0.85d), RIGHT_CLOSED(0.9d);
 
         private double pos;
 
