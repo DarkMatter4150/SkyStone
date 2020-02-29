@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.breakout;
 
 import com.qualcomm.hardware.rev.RevColorSensorV3;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -19,19 +18,27 @@ import static org.firstinspires.ftc.teamcode.breakout.BreakoutMotor.Direction.MO
  */
 public class Robot {
 
-    public RevColorSensorV3 getColorSensor() {
-        return colorSensor;
+    public RevColorSensorV3 getColorSensorRight() {
+        return colorSensorRight;
     }
 
-    public DistanceSensor getDistanceSensor() {
-        return distanceSensor;
+    public DistanceSensor getDistanceSensorRight() {
+        return distanceSensorRight;
+    }
+
+    public RevColorSensorV3 getColorSensorLeft() {
+        return colorSensorLeft;
+    }
+
+    public DistanceSensor getDistanceSensorLeft() {
+        return distanceSensorLeft;
     }
 
     /**
      * Enum for each motor on the robot.
      */
     public enum Motor {
-        FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT
+        FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT, ELEVATOR
     }
 
     /**
@@ -49,8 +56,8 @@ public class Robot {
      * Enum for the pull tabs' positions, open and closed for each side.
      */
     public enum TabPos {
-        LEFT_OPEN(1.0d), LEFT_CLOSED(0.56d),
-        RIGHT_OPEN(0.08d), RIGHT_CLOSED(0.52d);
+        LEFT_OPEN(0.3d), LEFT_CLOSED(0d),
+        RIGHT_OPEN(0.85d), RIGHT_CLOSED(1d);
 
         private double pos;
 
@@ -88,6 +95,7 @@ public class Robot {
     private BreakoutMotor wheelIntakeLeft = new BreakoutMotor();
     private BreakoutMotor wheelIntakeRight = new BreakoutMotor();
     private BreakoutMotor arm = new BreakoutMotor();
+    private BreakoutMotor elevator = new BreakoutMotor();
 
     //Servos
     private BreakoutServo intakeServoLeft = new BreakoutServo();
@@ -98,8 +106,10 @@ public class Robot {
     private BreakoutServo finger = new BreakoutServo();
 
     //Sensors
-    private RevColorSensorV3 colorSensor;
-    private DistanceSensor distanceSensor;
+    private RevColorSensorV3 colorSensorRight;
+    private DistanceSensor distanceSensorRight;
+    private RevColorSensorV3 colorSensorLeft;
+    private DistanceSensor distanceSensorLeft;
     private BreakoutREVGyro gyro = new BreakoutREVGyro();
 
     //Misc
@@ -233,6 +243,9 @@ public class Robot {
                 break;
             case BACK_RIGHT:
                 backRight.setPower(power);
+                break;
+            case ELEVATOR:
+                elevator.setPower(power);
                 break;
         }
     }
@@ -371,8 +384,10 @@ public class Robot {
         telemetry.clearAll();
         telemetry.update();
 
-        colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "colorSensor");
+        colorSensorRight = hardwareMap.get(RevColorSensorV3.class, "colorSensorRight");
+        distanceSensorRight = hardwareMap.get(DistanceSensor.class, "colorSensorRight");
+        colorSensorLeft = hardwareMap.get(RevColorSensorV3.class, "colorSensorLeft");
+        distanceSensorLeft = hardwareMap.get(DistanceSensor.class, "colorSensorLeft");
 
         // Define and Initialize Motors
         frontLeft.set(hardwareMap.dcMotor.get("frontLeft"));
@@ -392,6 +407,7 @@ public class Robot {
         finger.set(hardwareMap.servo.get("finger"));
         arm.set(hardwareMap.dcMotor.get("arm"));
         claw.set(hardwareMap.servo.get("claw"));
+        elevator.set(hardwareMap.dcMotor.get("elevator"));
 
 
         //Set directions for motors
@@ -406,6 +422,7 @@ public class Robot {
         wheelIntakeRight.setDirection(MOTOR_R);
 
         arm.setDirection(MOTOR_F);
+        elevator.setDirection(MOTOR_F);
 
         intakeServoLeft.setDirection(BreakoutServo.Direction.SERVO_R);
 
@@ -425,6 +442,7 @@ public class Robot {
         intakeServoRight.setPosition(IntakePos.RIGHT_CLOSED.pos);
 
         arm.setPower(0);
+        elevator.setPower(0);
         claw.setPosition(ClawPos.CLOSED.pos);
         finger.setPosition(FingerPos.CLOSED.pos);
 
@@ -440,5 +458,6 @@ public class Robot {
 
         arm.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 }

@@ -155,10 +155,10 @@
 //     * @return True: SkyStone; False: Normal block
 //     */
 //    private boolean checkColor() {
-//        ColorSensor colorSensor = robot.getColorSensor();
+//        ColorSensor colorSensor = robot.getColorSensorRight();
 //        float red = colorSensor.red();
 //        float blue = colorSensor.blue();
-//        DistanceSensor distanceSensor = robot.getDistanceSensor();
+//        DistanceSensor distanceSensor = robot.getDistanceSensorRight();
 //        float distance = EncoderDrive.toFloat(distanceSensor.getDistance(DistanceUnit.CM));
 //
 //        return !((red - blue > 30) && (distance < 6.5f) && (red > blue));

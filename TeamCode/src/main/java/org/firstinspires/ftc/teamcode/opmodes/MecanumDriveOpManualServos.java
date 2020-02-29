@@ -5,7 +5,6 @@ import android.graphics.Point;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -40,7 +39,7 @@ public class MecanumDriveOpManualServos extends OpMode {
 
     private ElapsedTime timer = new ElapsedTime();
     private Mecanum drive;
-    private boolean slow = false;
+    private int speed = 1;
     private boolean claw = false;
     private boolean tabs = true;
     private boolean finger = false;
@@ -100,23 +99,13 @@ public class MecanumDriveOpManualServos extends OpMode {
 
         //Move the motors//
         float[] output;
-        if (slow) {
-                float turnPower;
-                if (rightTrigger1 != 0 || leftTrigger1 != 0) {
-                    turnPower = rightTrigger1 - leftTrigger1;
-                } else {
-                    turnPower = 0;
-                }
-                output = drive.setPower(rightStick1x/2, leftStick1y/2, turnPower/2);
+        float turnPower;
+        if (rightTrigger1 != 0 || leftTrigger1 != 0) {
+            turnPower = rightTrigger1 - leftTrigger1;
         } else {
-                float turnPower;
-                if (rightTrigger1 != 0 || leftTrigger1 != 0) {
-                    turnPower = rightTrigger1 - leftTrigger1;
-                } else {
-                    turnPower = 0;
-                }
-                output = drive.setPower(rightStick1x, leftStick1y, turnPower);
+            turnPower = 0;
         }
+        output = drive.setPower(rightStick1x/speed, leftStick1y/speed, turnPower/speed);
 
         if (aButton && timer.milliseconds() - tabTimer > 250) {
             tabs = !tabs;
@@ -131,7 +120,10 @@ public class MecanumDriveOpManualServos extends OpMode {
         }
 
         if (gamepad1.a && timer.milliseconds() - slowTimer > 250) {
-            slow = !slow;
+            speed++;
+            if (speed > 4) {
+                speed = 1;
+            }
             slowTimer = timer.milliseconds();
         }
 
@@ -153,9 +145,20 @@ public class MecanumDriveOpManualServos extends OpMode {
             fingerTimer = timer.milliseconds();
         }
 
-        if (gamepad1.a) {
+        if (gamepad1.b) {
             savedPoint.x = (int)(robotObject.getCenterX());
             savedPoint.y = (int)(robotObject.getCenterY());
+        }
+
+        boolean up = gamepad2.dpad_up;
+        boolean down = gamepad2.dpad_down;
+
+        if (up) {
+            robot.setPower(Robot.Motor.ELEVATOR, 1);
+        } else if (down) {
+            robot.setPower(Robot.Motor.ELEVATOR, -1);
+        } else {
+            robot.setPower(Robot.Motor.ELEVATOR, 0);
         }
 
         robot.setWheelIntake(leftTrigger2-rightTrigger2);
@@ -173,14 +176,18 @@ public class MecanumDriveOpManualServos extends OpMode {
         telemetry.addData("BL Power Float", robot.getPower(Robot.Motor.BACK_LEFT));
         telemetry.addData("BR Power Float", robot.getPower(Robot.Motor.BACK_RIGHT));
         telemetry.addData("Claw Pos", robot.getClawPos());
-        telemetry.addData("slow?", slow);
+        if (speed != 1) {
+            telemetry.addData("Speed", "1/" + speed);
+        } else {
+            telemetry.addData("Speed", "1");
+        }
     }
 
     private boolean checkColor() {
-        RevColorSensorV3 colorSensor = robot.getColorSensor();
+        RevColorSensorV3 colorSensor = robot.getColorSensorRight();
         float red = colorSensor.red();
         float blue = colorSensor.blue();
-        DistanceSensor distanceSensor = robot.getDistanceSensor();
+        DistanceSensor distanceSensor = robot.getDistanceSensorRight();
         float distance = EncoderDrive.toFloat(distanceSensor.getDistance(DistanceUnit.CM));
 
         return !((red - blue > 30) && (distance < 6.5f) && (red > blue));

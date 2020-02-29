@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -21,7 +20,6 @@ import org.firstinspires.ftc.teamcode.matrix.Matrix;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 
 /*
@@ -240,11 +238,10 @@ public class Auto extends LinearOpMode {
             moveCoord(106, 49 - (i * 8), 0, 100, 2000, 0.5);
             Log.i("SKYSTONES", robotObject.getCenterX() + "," + robotObject.getCenterY());
             if (i < 2) {
-
                 int i2 = 0;
                 int check = 0;
                 while (i2 < 20) {
-                    if (checkColor()) {
+                    if (checkColorLeft()) {
                         check++;
                     }
                     i2++;
@@ -257,8 +254,10 @@ public class Auto extends LinearOpMode {
             } else {
                 skyStonePosition = 3;
             }
+            double angle = robot.getAngle();
+            moveCoord(robotObject.getCenterX(), robotObject.getCenterY(), (int)Math.round(angle), 100, 1000, 0.7d);
         }
-        moveCoord(robotObject.getCenterX(), robotObject.getCenterY() - 5);
+        moveCoord(robotObject.getCenterX(), robotObject.getCenterY() - 8);
         Log.i("SKYSTONES", robotObject.getCenterX() + "," + robotObject.getCenterY());
         grabBlock(1000);
 //        moveCoord(116, robotObject.getCenterY());
@@ -289,10 +288,10 @@ public class Auto extends LinearOpMode {
         moveTarget(field.getObject("r foundation"), 14f, 0, 0, 100, 2000, null);
         robot.setTabs(false);
         pause(1000);
-        moveCoord(135, 122.75f, 0, 100, 2000, null);
+        moveCoord(133, 122.75f, 0, 100, 2000, null);
         robot.setTabs(true);
         pause(3000);
-        moveCoord(135, 95, 0, 100, 2300, null);
+        moveCoord(133, 95, 0, 100, 2300, null);
     }
 
     /**
@@ -304,7 +303,7 @@ public class Auto extends LinearOpMode {
         moveTarget(field.getObject("b foundation"), -14f, 0, 0, 100, 2000, null);
         robot.setTabs(false);
         pause(1000);
-        moveCoord(9, 122.75f, 0, 100, 2000, null);
+        moveCoord(9, 122.75f, 90, 100, 2500, null);
         robot.setTabs(true);
         pause(3000);
         moveCoord(9, 95, 0, 100, 2300, null);
@@ -315,11 +314,29 @@ public class Auto extends LinearOpMode {
      *
      * @return True: SkyStone; False: Normal block
      */
-    private boolean checkColor() {
-        RevColorSensorV3 colorSensor = robot.getColorSensor();
+    private boolean checkColorRight() {
+        RevColorSensorV3 colorSensor = robot.getColorSensorRight();
         float red = colorSensor.red();
         float blue = colorSensor.blue();
-        DistanceSensor distanceSensor = robot.getDistanceSensor();
+        DistanceSensor distanceSensor = robot.getDistanceSensorRight();
+        float distance = EncoderDrive.toFloat(distanceSensor.getDistance(DistanceUnit.CM));
+        boolean found = red - blue <= 30 && distance < 6.5f;
+
+        Log.i("COLOR", String.format("red %f, blue %f, green %d, distance %f, found %b", red, blue, -1, distance, found));
+
+        return found;
+    }
+
+    /**
+     * Checks if the thing the color sensor is looking at is closer than 6.5 cm and not yellow
+     *
+     * @return True: SkyStone; False: Normal block
+     */
+    private boolean checkColorLeft() {
+        RevColorSensorV3 colorSensor = robot.getColorSensorLeft();
+        float red = colorSensor.red();
+        float blue = colorSensor.blue();
+        DistanceSensor distanceSensor = robot.getDistanceSensorLeft();
         float distance = EncoderDrive.toFloat(distanceSensor.getDistance(DistanceUnit.CM));
         boolean found = red - blue <= 30 && distance < 6.5f;
 
